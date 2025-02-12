@@ -1,37 +1,25 @@
-# WeTodo
+# WeTodo 小程序
 
-一个功能丰富的日历待办事项小程序，支持农历、节假日等功能。
+一个基于微信小程序的待办事项管理应用。
 
-## 功能特点
+## 功能特性
 
 - 任务管理
-  - 添加、编辑、删除任务
+  - 创建、编辑、删除任务
   - 设置任务优先级
-  - 任务分类和标签
-  - 任务提醒
-
-- 日历功能
-  - 农历和节假日显示
+  - 添加任务备注、截止时间
+  - 标记任务完成状态
+  
+- 日历视图
+  - 农历/节假日显示
   - 任务日历视图
-  - 宜忌提示
+  - 日程安排
 
-- 其他功能
-  - 深色模式
-  - 自定义主题色
-  - 数据备份
-
-## 开发环境
-
-- 微信开发者工具
-- Node.js >= 14.0.0
-- npm >= 6.0.0
-
-## 项目设置
+## 快速开始
 
 1. 克隆项目
 ```bash
 git clone https://github.com/your-username/wetodo.git
-cd wetodo
 ```
 
 2. 安装依赖
@@ -39,33 +27,39 @@ cd wetodo
 npm install
 ```
 
-3. 在微信开发者工具中打开项目
-- 导入项目
-- 选择项目目录
-- 填入自己的 AppID
+3. 在微信开发者工具中导入项目
 
-## 目录结构
+4. 开始开发
+
+## 项目结构
 
 ```
-wetodo/
-├── assets/          # 静态资源
-├── components/      # 公共组件
-├── pages/          # 页面文件
-├── utils/          # 工具函数
-├── app.js          # 入口文件
-├── app.json        # 全局配置
-├── app.wxss        # 全局样式
-└── project.config.json  # 项目配置
+project/
+├── docs/                # 文档
+├── src/                 # 源代码
+│   ├── components/      # 组件
+│   ├── pages/          # 页面
+│   ├── services/       # 服务层
+│   └── utils/          # 工具类
+└── tests/              # 测试
 ```
+
+## 技术栈
+
+- 微信小程序原生框架
+- LocalStorage 数据存储
+
+## 开发指南
+
+详细的开发文档请查看 [docs/](./docs/) 目录
 
 ## 贡献指南
 
 1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交 Pull Request
+2. 创建功能分支
+3. 提交代码
+4. 发起 Pull Request
 
 ## 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+MIT License
