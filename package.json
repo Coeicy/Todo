@@ -14,8 +14,7 @@
   "author": "your-name",
   "license": "MIT",
   "dependencies": {
-    "dayjs": "^1.11.7",
-    "supabase-wechat-stable-v2": "^0.1.0"
+    "dayjs": "^1.11.7"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^3.9.1"

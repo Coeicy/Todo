@@ -1,22 +1,13 @@
 const db = require('./utils/db')
-const { createClient } = require('supabase-wechat-stable-v2')
 
 App({
   globalData: {
     userInfo: null,
     theme: 'light',
-    db: null,
-    supabase: null
+    db: null
   },
 
   onLaunch() {
-    // 初始化 MemFireDB 客户端
-    const supabase = createClient(
-      'YOUR_MEMFIREDB_URL',
-      'YOUR_MEMFIREDB_ANON_KEY'
-    )
-    this.globalData.supabase = supabase
-
     // 确保数据库最先初始化
     db.init()
     this.globalData.db = db
