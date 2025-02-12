@@ -1,0 +1,49 @@
+<view class="quadrant-container">
+  <!-- 任务输入区域 -->
+  <view class="task-input">
+    <picker mode="selector" range="{{['重要 & 紧急', '重要 & 不紧急', '不重要 & 紧急', '不重要 & 不紧急']}}" 
+            bindchange="selectQuadrant">
+      <view class="picker">选择象限</view>
+    </picker>
+    <input placeholder="输入任务内容" value="{{newTask.content}}" bindinput="inputTaskContent" />
+    <button bindtap="addTask">添加任务</button>
+  </view>
+
+  <!-- 任务显示区域 -->
+  <view class="quadrant">
+    <view class="title">🔥 重要 & 紧急</view>
+    <block wx:for="{{tasks.urgentImportant}}" wx:key="index">
+      <view class="task">
+        {{item}}
+        <text class="delete" bindtap="deleteTask" data-quadrant="urgentImportant" data-index="{{index}}">×</text>
+      </view>
+    </block>
+  </view>
+  <view class="quadrant">
+    <view class="title">⭐ 重要 & 不紧急</view>
+    <block wx:for="{{tasks.importantNotUrgent}}" wx:key="index">
+      <view class="task">
+        {{item}}
+        <text class="delete" bindtap="deleteTask" data-quadrant="importantNotUrgent" data-index="{{index}}">×</text>
+      </view>
+    </block>
+  </view>
+  <view class="quadrant">
+    <view class="title">⏰ 不重要 & 紧急</view>
+    <block wx:for="{{tasks.urgentNotImportant}}" wx:key="index">
+      <view class="task">
+        {{item}}
+        <text class="delete" bindtap="deleteTask" data-quadrant="urgentNotImportant" data-index="{{index}}">×</text>
+      </view>
+    </block>
+  </view>
+  <view class="quadrant">
+    <view class="title">🌱 不重要 & 不紧急</view>
+    <block wx:for="{{tasks.notUrgentNotImportant}}" wx:key="index">
+      <view class="task">
+        {{item}}
+        <text class="delete" bindtap="deleteTask" data-quadrant="notUrgentNotImportant" data-index="{{index}}">×</text>
+      </view>
+    </block>
+  </view>
+</view> 

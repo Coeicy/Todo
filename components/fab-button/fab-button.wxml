@@ -1,0 +1,4 @@
+<!-- fab-button.wxml -->
+<button class="fab-button {{isDisabled ? 'fab-button--disabled' : ''}}">
+  <!-- 按钮内容 -->
+</button>

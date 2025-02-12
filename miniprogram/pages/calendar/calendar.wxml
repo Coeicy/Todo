@@ -1,0 +1,29 @@
+<!-- pages/calendar/calendar.wxml -->
+<view class="container">
+<view class="calendar-header">
+  <view class="month-control">
+    <button class="prev-month" bindtap="changeMonth" data-delta="-1">‹</button>
+    <text>{{currentYear}}年{{currentMonth}}月</text>
+    <button class="next-month" bindtap="changeMonth" data-delta="1">›</button>
+  </view>
+</view>
+  <view class="calendar-body">
+    <view class="weekdays">
+      <view class="weekday">日</view>
+      <view class="weekday">一</view>
+      <view class="weekday">二</view>
+      <view class="weekday">三</view>
+      <view class="weekday">四</view>
+      <view class="weekday">五</view>
+      <view class="weekday">六</view>
+    </view>
+    <view class="days">
+      <block wx:for="{{calendarData}}" wx:key="index">
+        <view class="day {{item.isHoliday? 'holiday' : ''}} {{item.isCurrentDay? 'current' : ''}} {{item.isWeekend? 'weekend' : ''}} {{item.hasEvent? 'has-event' : ''}}">
+          <text>{{item.date}}</text>
+          <text>{{item.lunarDate}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

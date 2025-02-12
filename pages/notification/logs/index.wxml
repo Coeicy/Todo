@@ -1,0 +1,88 @@
+<view class="container">
+  <!-- 筛选区域 -->
+  <view class="filter-section">
+    <view class="filter-item">
+      <picker mode="selector" range="{{['全部', '任务提醒', '过期提醒', '每日摘要']}}" 
+              bindchange="onFilterChange" data-field="type">
+        <view class="picker">
+          类型：{{filters.type || '全部'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="filter-item">
+      <picker mode="date" bindchange="onFilterChange" data-field="startDate">
+        <view class="picker">
+          开始：{{filters.startDate || '请选择'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="filter-item">
+      <picker mode="date" bindchange="onFilterChange" data-field="endDate">
+        <view class="picker">
+          结束：{{filters.endDate || '请选择'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="filter-item">
+      <picker mode="selector" range="{{['全部', '成功', '失败']}}" 
+              bindchange="onFilterChange" data-field="success">
+        <view class="picker">
+          状态：{{filters.success || '全部'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="filter-actions">
+      <button size="mini" bindtap="clearFilters">清除</button>
+      <button size="mini" type="primary" bindtap="exportLogs">导出</button>
+    </view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-section">
+    <view class="stats-item" wx:for="{{stats}}" wx:key="_id">
+      <view class="stats-title">{{item._id}}</view>
+      <view class="stats-content">
+        <text>总数：{{item.total}}</text>
+        <text>成功：{{item.success}}</text>
+        <text>失败：{{item.failed}}</text>
+        <text>成功率：{{item.successRate}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 日志列表 -->
+  <view class="logs-list">
+    <view class="log-item" wx:for="{{logs}}" wx:key="_id" 
+          bindtap="viewLogDetail" data-log="{{item}}">
+      <view class="log-header">
+        <text class="log-type">{{item.type}}</text>
+        <text class="log-time">{{item.createTime}}</text>
+      </view>
+      <view class="log-content">
+        <text class="log-title">{{item.data.title || item.taskId}}</text>
+        <text class="log-status {{item.success ? 'success' : 'failed'}}">
+          {{item.success ? '成功' : '失败'}}
+        </text>
+      </view>
+      <view class="log-footer" wx:if="{{!item.success}}">
+        <button size="mini" type="warn" 
+                catchtap="retryNotification" data-log="{{item}}">
+          重试
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <view class="no-more" wx:if="{{logs.length > 0 && page >= totalPages}}">
+    没有更多数据了
+  </view>
+  <view class="empty" wx:if="{{logs.length === 0 && !loading}}">
+    暂无通知日志
+  </view>
+</view> 

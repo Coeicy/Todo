@@ -1,0 +1,19 @@
+{
+  "triggers": [
+    {
+      "name": "checkAndSendNotifications",
+      "type": "timer",
+      "config": "*/5 * * * *"
+    },
+    {
+      "name": "cleanupNotifications",
+      "type": "timer",
+      "config": "0 0 * * *"
+    },
+    {
+      "name": "cleanupExportFiles",
+      "type": "timer",
+      "config": "0 */6 * * *"
+    }
+  ]
+} 

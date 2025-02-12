@@ -1,0 +1,41 @@
+/* fab-button.wxss */
+.fab-button {
+  /* 使用类选择器 */
+  background-color: #007aff;
+}
+
+.fab-button--disabled {
+  /* 使用类选择器替代属性选择器 */
+  opacity: 0.5;
+}
+
+.fab-button {
+  position: fixed;
+  right: 30rpx;
+  bottom: 30rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: #007AFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.fab-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 8rpx rgba(18, 150, 219, 0.3);
+}
+
+.fab-button image {
+  width: 50rpx;
+  height: 50rpx;
+}
+
+.plus {
+  color: #fff;
+  font-size: 60rpx;
+  line-height: 1;
+} 

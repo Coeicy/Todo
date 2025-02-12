@@ -1,0 +1,35 @@
+<view class="container">
+  <!-- 四个象限容器 -->
+  <view class="quadrants">
+    <block wx:for="{{quadrants}}" wx:key="id">
+      <view class="quadrant">
+        <view class="quadrant-header">
+          <text class="quadrant-title">{{item.title}}</text>
+          <button class="add-btn" bindtap="addTask" data-quadrant="{{item.id}}">+</button>
+        </view>
+        
+        <view class="task-list">
+          <block wx:for="{{item.tasks}}" wx:key="id">
+            <view class="task-item">
+              <checkbox checked="{{item.completed}}" bindtap="toggleTask" 
+                data-quadrant="{{item.id}}" data-task-id="{{item.id}}"/>
+              <text class="task-content {{item.completed ? 'completed' : ''}}">
+                {{item.content}}
+              </text>
+              <button class="delete-btn" bindtap="deleteTask" 
+                data-quadrant="{{item.id}}" data-task-id="{{item.id}}">×</button>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部导航 -->
+  <view class="tabbar">
+    <view class="tabbar-item">
+      <text class="tabbar-icon">Q</text>
+      <text class="tabbar-text">象限页面</text>
+    </view>
+  </view>
+</view>

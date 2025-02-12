@@ -1,0 +1,60 @@
+<view class="container">
+  <form bindsubmit="handleSubmit">
+    <view class="form-item">
+      <label>任务名称</label>
+      <input 
+        name="taskName" 
+        placeholder="请输入任务名称"
+        value="{{taskName}}"
+        bindinput="handleTaskNameInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <label>截止时间</label>
+      <picker 
+        mode="date" 
+        value="{{dueDate}}"
+        start="{{dueDate}}"
+        bindchange="handleDateChange"
+      >
+        <view class="picker">{{dueDate}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <label>地点</label>
+      <input 
+        name="location" 
+        placeholder="请输入地点"
+        value="{{location}}"
+        bindinput="handleLocationInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <label>备注</label>
+      <textarea 
+        name="notes" 
+        placeholder="请输入备注"
+        value="{{notes}}"
+        bindinput="handleNotesInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <label>附件</label>
+      <view class="attachments">
+        <block wx:for="{{attachments}}" wx:key="index">
+          <view class="attachment-item">
+            <text>{{item.name}}</text>
+            <button size="mini" bindtap="handleRemoveAttachment" data-index="{{index}}">删除</button>
+          </view>
+        </block>
+        <button bindtap="handleUploadAttachment">上传附件</button>
+      </view>
+    </view>
+
+    <button formType="submit" type="primary">创建任务</button>
+  </form>
+</view>

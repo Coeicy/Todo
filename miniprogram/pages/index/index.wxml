@@ -1,0 +1,79 @@
+<view class="container">
+  <view class="kanban">
+    <view class="kanban-column">
+      <text class="column-title">今天</text>
+      <block wx:for="{{groupedTasks.today}}" wx:key="id">
+        <view class="task-card">
+          <checkbox checked="{{item.completed}}" bindtap="toggleTaskStatus" data-index="{{index}}"/>
+          <view class="task-content">
+            <text class="task-name">{{item.name}}</text>
+            <text class="task-due-date">截止时间: {{item.dueDate}}</text>
+            <text class="task-location">地点: {{item.location}}</text>
+          </view>
+          <button bindtap="deleteTask" data-index="{{index}}">删除</button>
+        </view>
+      </block>
+    </view>
+
+    <view class="kanban-column">
+      <text class="column-title">明天</text>
+      <block wx:for="{{groupedTasks.tomorrow}}" wx:key="id">
+        <view class="task-card">
+          <checkbox checked="{{item.completed}}" bindtap="toggleTaskStatus" data-index="{{index}}"/>
+          <view class="task-content">
+            <text class="task-name">{{item.name}}</text>
+            <text class="task-due-date">截止时间: {{item.dueDate}}</text>
+            <text class="task-location">地点: {{item.location}}</text>
+          </view>
+          <button bindtap="deleteTask" data-index="{{index}}">删除</button>
+        </view>
+      </block>
+    </view>
+
+    <view class="kanban-column">
+      <text class="column-title">本周</text>
+      <block wx:for="{{groupedTasks.thisWeek}}" wx:key="id">
+        <view class="task-card">
+          <checkbox checked="{{item.completed}}" bindtap="toggleTaskStatus" data-index="{{index}}"/>
+          <view class="task-content">
+            <text class="task-name">{{item.name}}</text>
+            <text class="task-due-date">截止时间: {{item.dueDate}}</text>
+            <text class="task-location">地点: {{item.location}}</text>
+          </view>
+          <button bindtap="deleteTask" data-index="{{index}}">删除</button>
+        </view>
+      </block>
+    </view>
+
+    <view class="kanban-column">
+      <text class="column-title">以后</text>
+      <block wx:for="{{groupedTasks.later}}" wx:key="id">
+        <view class="task-card">
+          <checkbox checked="{{item.completed}}" bindtap="toggleTaskStatus" data-index="{{index}}"/>
+          <view class="task-content">
+            <text class="task-name">{{item.name}}</text>
+            <text class="task-due-date">截止时间: {{item.dueDate}}</text>
+            <text class="task-location">地点: {{item.location}}</text>
+          </view>
+          <button bindtap="deleteTask" data-index="{{index}}">删除</button>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="stats">
+    <view class="stat-item">
+      <text>总任务: {{totalTasks}}</text>
+    </view>
+    <view class="stat-item">
+      <text>已完成: {{completedTasks}}</text>
+    </view>
+    <view class="stat-item">
+      <text>待完成: {{pendingTasks}}</text>
+    </view>
+  </view>
+
+  <view class="floating-btn" bindtap="navigateToCreateTask">
+    <text>+</text>
+  </view>
+</view>

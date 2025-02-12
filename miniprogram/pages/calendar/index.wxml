@@ -1,0 +1,8 @@
+<view class="container">
+  <!-- 日历内容 -->
+  
+  <!-- 添加任务按钮 -->
+  <view class="add-task-btn" bindtap="showAddTaskModal">
+    <text>+</text>
+  </view>
+</view>

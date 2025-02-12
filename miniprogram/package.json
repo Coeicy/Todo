@@ -1,0 +1,8 @@
+{
+  "name": "miniprogram-todo",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "lunar-typescript": "^1.6.9"
+  }
+}

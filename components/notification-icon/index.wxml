@@ -1,0 +1,8 @@
+<view class="notification-icon" bindtap="onClick">
+  <image class="icon" src="/assets/icons/notification.png" />
+  <view class="badge {{dot ? 'dot' : ''}}" 
+        style="background: {{color}}"
+        wx:if="{{showBadge}}">
+    <text wx:if="{{!dot && count}}">{{count > 99 ? '99+' : count}}</text>
+  </view>
+</view> 

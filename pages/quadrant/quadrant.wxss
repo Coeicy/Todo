@@ -1,0 +1,39 @@
+.quadrant-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.quadrant {
+  width: 50%;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.task {
+  padding: 10rpx;
+  margin: 5rpx 0;
+  background-color: #f5f5f5;
+  border-radius: 5rpx;
+}
+
+.task-input {
+  margin-bottom: 20rpx;
+}
+
+.picker {
+  border: 1rpx solid #ccc;
+  padding: 10rpx;
+  margin: 10rpx 0;
+}
+
+.delete {
+  color: red;
+  margin-left: 20rpx;
+  cursor: pointer;
+} 

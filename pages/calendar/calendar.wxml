@@ -1,0 +1,66 @@
+<view class="container">
+  <!-- 日历组件 -->
+  <calendar 
+    show-lunar="{{true}}"
+    show-festival="{{true}}"
+    show-solar-term="{{true}}"
+    show-task-dots="{{true}}"
+    tasks="{{tasks}}"
+    bind:select="onDateSelect"
+    bind:monthChange="onMonthChange"
+    bind:today="onGoToday"
+  />
+
+  <!-- 选中日期详情 -->
+  <view class="date-detail" wx:if="{{selectedDate}}">
+    <view class="detail-header">
+      <view class="date-info">
+        <text class="solar-date">{{selectedDate.fullDate}}</text>
+        <text class="lunar-date">{{selectedDate.lunar}}</text>
+      </view>
+      <view class="festival-info" wx:if="{{selectedDate.holiday || selectedDate.term}}">
+        <text class="festival">{{selectedDate.holiday}}</text>
+        <text class="term">{{selectedDate.term}}</text>
+      </view>
+    </view>
+
+    <view class="fortune-section">
+      <view class="section-title">今日运势</view>
+      <view class="fortune-content">
+        <view class="suitable">
+          <text class="label">宜：</text>
+          <text class="value">{{selectedDate.suitable}}</text>
+        </view>
+        <view class="unsuitable">
+          <text class="label">忌：</text>
+          <text class="value">{{selectedDate.unsuitable}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tasks-section">
+      <view class="section-header">
+        <text class="title">当日任务</text>
+        <view class="add-btn" bindtap="addTask">添加任务</view>
+      </view>
+      <view class="task-list">
+        <view class="task-item" 
+              wx:for="{{selectedDate.tasks}}" 
+              wx:key="id"
+              bindtap="showTaskDetail"
+              data-task="{{item}}">
+          <view class="task-status {{item.completed ? 'completed' : ''}}"></view>
+          <view class="task-content">
+            <view class="task-title">{{item.title}}</view>
+            <view class="task-time" wx:if="{{item.startTime}}">
+              {{item.startTime}} - {{item.dueDate}}
+            </view>
+          </view>
+        </view>
+        <view class="empty-tip" wx:if="{{!selectedDate.tasks.length}}">
+          暂无任务
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

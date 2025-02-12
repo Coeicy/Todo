@@ -1,0 +1,65 @@
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <block wx:elif="{{log}}">
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="section-title">基本信息</view>
+      <view class="info-item">
+        <text class="label">通知类型</text>
+        <text class="value">{{log.type}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">发送时间</text>
+        <text class="value">{{log.createTime}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">发送状态</text>
+        <text class="value status {{log.success ? 'success' : 'failed'}}">
+          {{log.success ? '成功' : '失败'}}
+        </text>
+      </view>
+    </view>
+
+    <!-- 通知内容 -->
+    <view class="section">
+      <view class="section-title">通知内容</view>
+      <view class="content-box">
+        <view wx:for="{{log.data}}" wx:key="index" class="content-item">
+          <text class="label">{{index}}</text>
+          <text class="value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 关联任务 -->
+    <view class="section" wx:if="{{taskInfo}}">
+      <view class="section-title">关联任务</view>
+      <view class="task-info" bindtap="viewTask">
+        <view class="task-title">{{taskInfo.title}}</view>
+        <view class="task-meta">
+          <text>{{taskInfo.dueDate}}</text>
+          <text class="{{taskInfo.completed ? 'completed' : ''}}">
+            {{taskInfo.completed ? '已完成' : '进行中'}}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 错误信息 -->
+    <view class="section" wx:if="{{!log.success}}">
+      <view class="section-title">错误信息</view>
+      <view class="error-box" bindtap="copyError">
+        <text class="error-text">{{log.error}}</text>
+        <text class="copy-hint">点击复制</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="actions" wx:if="{{!log.success}}">
+      <button type="primary" bindtap="retryNotification">重试发送</button>
+    </view>
+  </block>
+  <view class="empty" wx:else>
+    未找到日志信息
+  </view>
+</view> 

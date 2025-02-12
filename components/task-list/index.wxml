@@ -1,0 +1,30 @@
+<view class="task-list">
+  <block wx:if="{{tasks.length > 0}}">
+    <view class="task-item" 
+          wx:for="{{tasks}}" 
+          wx:key="id"
+          bindtap="onTaskClick"
+          data-task="{{item}}">
+      <view class="task-status {{item.completed ? 'completed' : ''}}" 
+            catchtap="toggleStatus"
+            data-task="{{item}}">
+        <text class="icon">{{item.completed ? '✓' : ''}}</text>
+      </view>
+      <view class="task-content">
+        <view class="task-title">{{item.title}}</view>
+        <view class="task-info" wx:if="{{item.dueDate || item.location}}">
+          <text wx:if="{{item.dueDate}}">⏰ {{item.dueDate}}</text>
+          <text wx:if="{{item.location}}">📍 {{item.location}}</text>
+        </view>
+      </view>
+      <view class="task-important {{item.important ? 'active' : ''}}"
+            catchtap="toggleImportant"
+            data-task="{{item}}">
+        <text class="icon">⭐</text>
+      </view>
+    </view>
+  </block>
+  <view class="empty-tip" wx:elif="{{showEmpty}}">
+    {{emptyText}}
+  </view>
+</view> 

@@ -1,0 +1,157 @@
+.container {
+  padding: 20rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 筛选区域样式 */
+.filter-section {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.filter-item {
+  margin-bottom: 16rpx;
+}
+
+.picker {
+  padding: 16rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.filter-actions button {
+  margin: 0;
+}
+
+/* 统计信息样式 */
+.stats-section {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.stats-item {
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.stats-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.stats-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.stats-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.stats-content text {
+  font-size: 24rpx;
+  color: #333;
+}
+
+/* 日志列表样式 */
+.logs-list {
+  margin-bottom: 20rpx;
+}
+
+.log-item {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.log-type {
+  font-size: 28rpx;
+  color: #666;
+  background: #f0f0f0;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.log-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.log-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.log-title {
+  font-size: 30rpx;
+  color: #333;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.log-status {
+  font-size: 26rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.log-status.success {
+  color: #52c41a;
+  background: #f6ffed;
+}
+
+.log-status.failed {
+  color: #ff4d4f;
+  background: #fff2f0;
+}
+
+.log-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12rpx;
+}
+
+/* 加载状态样式 */
+.loading,
+.no-more,
+.empty {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty {
+  background: #fff;
+  border-radius: 12rpx;
+  margin-top: 20rpx;
+} 

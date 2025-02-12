@@ -1,0 +1,44 @@
+<view class="calendar">
+  <!-- 日历头部 -->
+  <view class="calendar-header">
+    <view class="month-selector">
+      <view class="arrow" bindtap="changeMonth" data-type="prev">◀</view>
+      <view class="current-month">
+        <text class="solar">{{year}}年{{month}}月</text>
+        <text class="lunar" wx:if="{{showLunar}}">{{lunarInfo.year}} {{lunarInfo.zodiac}}</text>
+      </view>
+      <view class="arrow" bindtap="changeMonth" data-type="next">▶</view>
+    </view>
+    <view class="weekdays">
+      <view class="weekday" wx:for="{{weekdays}}" wx:key="*this">{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 日历主体 -->
+  <view class="calendar-body">
+    <view class="days">
+      <view class="day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.fullDate === selectedDate.fullDate ? 'selected' : ''}}"
+            wx:for="{{days}}" 
+            wx:key="fullDate"
+            bindtap="selectDate"
+            data-date="{{item.fullDate}}">
+        <view class="solar-date">{{item.date}}</view>
+        <view class="lunar-date" wx:if="{{showLunar}}">{{item.lunar}}</view>
+        <view class="festival" wx:if="{{showFestival && item.holiday}}">{{item.holiday}}</view>
+        <view class="term" wx:elif="{{showSolarTerm && item.term}}">{{item.term}}</view>
+        <view class="task-dots" wx:if="{{showTaskDots && item.tasks.length}}">
+          <view class="dot {{task.completed ? 'completed' : ''}}" 
+                wx:for="{{item.tasks}}" 
+                wx:key="id" 
+                wx:for-item="task">
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 返回今天按钮 -->
+  <view class="today-btn" bindtap="goToday">
+    <text>今天</text>
+  </view>
+</view> 

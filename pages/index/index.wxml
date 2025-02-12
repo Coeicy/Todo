@@ -1,0 +1,126 @@
+<view class="container">
+  <!-- 顶部工具栏 -->
+  <view class="toolbar">
+    <view class="title">我的任务</view>
+    <view class="actions">
+      <notification-icon 
+        count="{{unreadCount}}"
+        bindclick="onNotificationClick"
+      />
+      <view class="add-btn" bindtap="onAddTask">
+        <text class="icon">+</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 任务统计 -->
+  <view class="statistics">
+    <view class="stat-item">
+      <text class="stat-number">{{totalTasks}}</text>
+      <text class="stat-label">总任务</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{completedTasks}}</text>
+      <text class="stat-label">已完成</text>
+    </view>
+  </view>
+
+  <!-- 任务分类标签 -->
+  <view class="tabs">
+    <view class="tab {{currentTab === 'today' ? 'active' : ''}}" bindtap="switchTab" data-tab="today">今日任务</view>
+    <view class="tab {{currentTab === 'important' ? 'active' : ''}}" bindtap="switchTab" data-tab="important">重要任务</view>
+  </view>
+
+  <!-- 使用任务列表组件 -->
+  <task-list 
+    tasks="{{tasks}}"
+    bind:click="viewTask"
+    bind:statusChange="onTaskStatusChange"
+    bind:importantChange="onTaskImportantChange"
+  />
+
+  <!-- 添加任务按钮 -->
+  <view class="add-task-btn" bindtap="showAddTask">
+    <text class="plus">+</text>
+  </view>
+
+  <!-- 添加任务弹窗 -->
+  <view class="add-task-modal" wx:if="{{showAddTaskModal}}">
+    <view class="modal-mask" bindtap="hideAddTask"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>添加任务</text>
+      </view>
+      <view class="modal-body">
+        <input class="task-input" 
+               placeholder="请输入任务内容"
+               value="{{newTask.title}}"
+               bindinput="onTitleInput"/>
+        
+        <textarea class="task-notes"
+                  placeholder="添加备注..."
+                  value="{{newTask.notes}}"
+                  bindinput="onNotesInput"/>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-default" bindtap="hideAddTask">取消</button>
+        <button class="btn btn-primary" bindtap="submitNewTask">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加任务详情模态框 -->
+  <view class="task-detail-modal" wx:if="{{showTaskDetailModal}}">
+    <view class="modal-mask" bindtap="hideTaskDetail"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>任务详情</text>
+        <text class="close-btn" bindtap="hideTaskDetail">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="detail-title {{currentTask.important ? 'important' : ''}}">
+          {{currentTask.title}}
+        </view>
+        
+        <view class="detail-section" wx:if="{{currentTask.startTime || currentTask.dueDate}}">
+          <view class="section-title">⏰ 时间信息</view>
+          <view class="time-range">
+            <text class="time-emoji">🟢</text>
+            <view class="time-container">
+              <view class="time-progress" style="width: {{calculateProgress(currentTask.startTime, currentTask.dueDate)}}%"></view>
+              <view class="time-text">{{formatDateTime(currentTask.startTime, currentTask.dueDate)}}</view>
+            </view>
+            <text class="time-emoji">🔴</text>
+          </view>
+        </view>
+        
+        <view class="detail-section" wx:if="{{currentTask.location}}">
+          <view class="section-title">📍 地点</view>
+          <view class="section-content">{{currentTask.location}}</view>
+        </view>
+        
+        <view class="detail-section" wx:if="{{currentTask.url}}">
+          <view class="section-title">🔗 相关链接</view>
+          <view class="section-content">{{currentTask.url}}</view>
+        </view>
+        
+        <view class="detail-section" wx:if="{{currentTask.notes}}">
+          <view class="section-title">📝 备注</view>
+          <rich-text class="section-content" nodes="{{currentTask.notes}}"></rich-text>
+        </view>
+
+        <view class="detail-section">
+          <view class="section-title">⚙️ 其他信息</view>
+          <view class="section-content">
+            <view>创建时间：{{formatDateTime(currentTask.createTime)}}</view>
+            <view wx:if="{{currentTask.completedTime}}">完成时间：{{formatDateTime(currentTask.completedTime)}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="edit-btn" bindtap="editCurrentTask">编辑</button>
+        <button class="delete-btn" bindtap="deleteCurrentTask">删除</button>
+      </view>
+    </view>
+  </view>
+</view> 

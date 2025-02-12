@@ -1,0 +1,137 @@
+<view class="container">
+  <view class="task-detail card" wx:if="{{task}}">
+    <!-- 任务头部 -->
+    <view class="task-header">
+      <view class="status-bar">
+        <view class="status {{task.completed ? 'completed' : ''}}" bindtap="toggleStatus">
+          <text class="icon">{{task.completed ? '✓' : ''}}</text>
+        </view>
+        <view class="important {{task.important ? 'active' : ''}}" bindtap="toggleImportant">
+          <text class="icon">⭐</text>
+        </view>
+      </view>
+      <view class="title">{{task.title}}</view>
+    </view>
+
+    <!-- 任务信息 -->
+    <view class="task-info">
+      <view class="info-item" wx:if="{{task.startTime || task.dueDate}}">
+        <view class="label">⏰ 时间</view>
+        <view class="value">
+          <text wx:if="{{task.startTime}}">{{task.startTime}}</text>
+          <text wx:if="{{task.startTime && task.dueDate}}"> - </text>
+          <text wx:if="{{task.dueDate}}">{{task.dueDate}}</text>
+        </view>
+      </view>
+
+      <view class="info-item" wx:if="{{task.location}}">
+        <view class="label">📍 地点</view>
+        <view class="value">{{task.location}}</view>
+      </view>
+
+      <view class="info-item" wx:if="{{task.url}}">
+        <view class="label">🔗 链接</view>
+        <view class="value link">{{task.url}}</view>
+      </view>
+
+      <view class="info-item" wx:if="{{task.notes}}">
+        <view class="label">📝 备注</view>
+        <view class="value">{{task.notes}}</view>
+      </view>
+
+      <view class="info-item">
+        <view class="label">⚙️ 其他</view>
+        <view class="value">
+          <view>创建时间：{{task.createTime}}</view>
+          <view wx:if="{{task.completed}}">完成时间：{{task.completedTime}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="actions">
+      <button class="btn btn-default" bindtap="showEditModal">编辑</button>
+      <button class="btn btn-primary" bindtap="deleteTask">删除</button>
+    </view>
+  </view>
+
+  <!-- 编辑模态框 -->
+  <view class="modal" wx:if="{{showEditModal}}">
+    <view class="modal-mask" bindtap="hideEditModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="title">编辑任务</text>
+        <text class="close" bindtap="hideEditModal">×</text>
+      </view>
+
+      <view class="modal-body">
+        <view class="form-item">
+          <input class="input" 
+                 placeholder="任务标题" 
+                 value="{{editForm.title}}"
+                 data-field="title"
+                 bindinput="onInput"/>
+        </view>
+
+        <view class="form-item">
+          <textarea class="textarea" 
+                    placeholder="备注" 
+                    value="{{editForm.notes}}"
+                    data-field="notes"
+                    bindinput="onInput"/>
+        </view>
+
+        <view class="form-item">
+          <picker mode="date" 
+                  value="{{editForm.startTime}}"
+                  data-field="startTime"
+                  bindchange="onInput">
+            <view class="picker">
+              <text class="label">开始时间：</text>
+              <text class="value">{{editForm.startTime || '请选择'}}</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <picker mode="date" 
+                  value="{{editForm.dueDate}}"
+                  data-field="dueDate"
+                  bindchange="onInput">
+            <view class="picker">
+              <text class="label">截止时间：</text>
+              <text class="value">{{editForm.dueDate || '请选择'}}</text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <input class="input" 
+                 placeholder="地点" 
+                 value="{{editForm.location}}"
+                 data-field="location"
+                 bindinput="onInput"/>
+        </view>
+
+        <view class="form-item">
+          <input class="input" 
+                 placeholder="相关链接" 
+                 value="{{editForm.url}}"
+                 data-field="url"
+                 bindinput="onInput"/>
+        </view>
+
+        <view class="form-item">
+          <switch checked="{{editForm.important}}" 
+                  bindchange="toggleImportant"/>
+          <text class="switch-label">标记为重要</text>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn btn-default" bindtap="hideEditModal">取消</button>
+        <button class="btn btn-primary" bindtap="updateTask">保存</button>
+      </view>
+    </view>
+  </view>
+</view> 

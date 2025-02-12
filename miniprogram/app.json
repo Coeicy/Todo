@@ -1,0 +1,40 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/taskDetail/taskDetail",
+    "pages/editTask/editTask",
+    "pages/calendar/calendar",
+    "pages/quadrant/quadrant"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeTodo",
+    "navigationBarTextStyle":"black"
+  },
+  "tabBar":{
+    "color": "#999999",
+    "selectedColor": "#1296db",
+    "list":[
+      {
+        "pagePath":"pages/index/index",
+        "text":"Tasks",
+        "iconPath":"images/icons/home.png",
+        "selectedIconPath":"images/icons/home.png"
+      },
+      {
+        "pagePath":"pages/calendar/calendar",
+        "text":"Calendar",
+        "iconPath":"images/wechat/time.png",
+        "selectedIconPath":"images/wechat/time.png"
+      },
+      {
+        "pagePath":"pages/quadrant/quadrant",
+        "text":"Quadrant",
+        "iconPath":"images/wechat/apps.png",
+        "selectedIconPath":"images/wechat/apps.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,76 @@
+<view class="container">
+  <view class="form card">
+    <!-- 标题输入 -->
+    <view class="form-item">
+      <input class="input" 
+             placeholder="任务标题" 
+             value="{{form.title}}"
+             data-field="title"
+             bindinput="onInput"/>
+    </view>
+
+    <!-- 备注输入 -->
+    <view class="form-item">
+      <textarea class="textarea" 
+                placeholder="备注" 
+                value="{{form.notes}}"
+                data-field="notes"
+                bindinput="onInput"/>
+    </view>
+
+    <!-- 时间选择 -->
+    <view class="form-item">
+      <picker mode="date" 
+              value="{{form.startTime}}"
+              data-field="startTime"
+              bindchange="onInput">
+        <view class="picker">
+          <text class="label">开始时间：</text>
+          <text class="value">{{form.startTime || '请选择'}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <picker mode="date" 
+              value="{{form.dueDate}}"
+              data-field="dueDate"
+              bindchange="onInput">
+        <view class="picker">
+          <text class="label">截止时间：</text>
+          <text class="value">{{form.dueDate || '请选择'}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 地点选择 -->
+    <view class="form-item">
+      <view class="location-picker" bindtap="chooseLocation">
+        <text class="label">地点：</text>
+        <text class="value">{{form.location || '点击选择'}}</text>
+      </view>
+    </view>
+
+    <!-- 链接输入 -->
+    <view class="form-item">
+      <input class="input" 
+             placeholder="相关链接" 
+             value="{{form.url}}"
+             data-field="url"
+             bindinput="onInput"/>
+    </view>
+
+    <!-- 重要标记 -->
+    <view class="form-item switch-item">
+      <switch checked="{{form.important}}" 
+              bindchange="toggleImportant"/>
+      <text class="switch-label">标记为重要</text>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <button class="btn btn-default" bindtap="cancel">取消</button>
+    <button class="btn btn-primary" bindtap="submitForm">创建</button>
+  </view>
+</view> 

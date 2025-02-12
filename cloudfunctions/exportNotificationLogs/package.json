@@ -1,0 +1,16 @@
+{
+  "name": "exportNotificationLogs",
+  "version": "1.0.0",
+  "description": "导出通知日志",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "node-xlsx": "^0.21.0",
+    "dayjs": "^1.11.7"
+  }
+} 

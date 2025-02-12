@@ -1,0 +1,205 @@
+/* 任务详情卡片 */
+.task-detail {
+  margin-top: 20rpx;
+}
+
+/* 任务头部 */
+.task-header {
+  margin-bottom: 30rpx;
+}
+
+.status-bar {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.status {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #1890ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status.completed {
+  background: #52c41a;
+  border-color: #52c41a;
+  color: #fff;
+}
+
+.important {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.important.active {
+  color: #faad14;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 任务信息 */
+.task-info {
+  margin-bottom: 30rpx;
+}
+
+.info-item {
+  margin-bottom: 20rpx;
+}
+
+.info-item .label {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.info-item .value {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.info-item .link {
+  color: #1890ff;
+  text-decoration: underline;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.actions .btn {
+  flex: 1;
+}
+
+/* 编辑模态框 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-radius: 20rpx 20rpx 0 0;
+  padding: 30rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.modal-header .title {
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.modal-header .close {
+  font-size: 40rpx;
+  color: #999;
+  padding: 10rpx;
+}
+
+.modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-item {
+  margin-bottom: 20rpx;
+}
+
+.input {
+  width: 100%;
+  height: 80rpx;
+  border: 1px solid #e8e8e8;
+  border-radius: 6rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+.textarea {
+  width: 100%;
+  height: 160rpx;
+  border: 1px solid #e8e8e8;
+  border-radius: 6rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+}
+
+.picker {
+  height: 80rpx;
+  border: 1px solid #e8e8e8;
+  border-radius: 6rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.picker .label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+}
+
+.picker .value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.switch-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-left: 20rpx;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.modal-footer .btn {
+  flex: 1;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+} 

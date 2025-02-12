@@ -1,0 +1,23 @@
+{
+  "name": "wetodo",
+  "version": "1.0.0",
+  "description": "一个功能丰富的日历待办事项小程序",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "todo",
+    "calendar",
+    "miniprogram"
+  ],
+  "author": "your-name",
+  "license": "MIT",
+  "dependencies": {
+    "dayjs": "^1.11.7",
+    "supabase-wechat-stable-v2": "^0.1.0"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^3.9.1"
+  }
+}

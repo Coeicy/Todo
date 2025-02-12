@@ -1,0 +1,616 @@
+/* 统计区域样式 */
+.statistics {
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: var(--text-color-light);
+  margin-top: 8rpx;
+}
+
+/* 分类标签样式 */
+.tabs {
+  display: flex;
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: var(--text-color-light);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background: var(--primary-color);
+  border-radius: 2rpx;
+}
+
+/* 任务列表样式 */
+.task-list {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+
+.task-group {
+  margin-bottom: 30rpx;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.group-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.task-count {
+  font-size: 24rpx;
+  color: var(--text-color-light);
+}
+
+.task-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+  transition: background-color 0.3s;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.task-title {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.task-title text {
+  font-size: 28rpx;
+  color: var(--text-color);
+  transition: all 0.3s;
+}
+
+.completed-text {
+  text-decoration: line-through;
+  color: var(--text-color-light) !important;
+}
+
+.task-actions {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.task-item:hover .task-actions {
+  opacity: 1;
+}
+
+.delete-btn {
+  font-size: 24rpx;
+  color: var(--error-color);
+  padding: 4rpx 12rpx;
+}
+
+.task-info {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-color-light);
+}
+
+.icon {
+  font-size: 24rpx;
+}
+
+.task-notes {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-color-light);
+  padding-top: 12rpx;
+  border-top: 1rpx solid var(--border-color);
+}
+
+/* 添加任务按钮 */
+.add-task-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.add-task-btn:active {
+  transform: scale(0.95);
+}
+
+.plus {
+  color: #fff;
+  font-size: 48rpx;
+  font-weight: 300;
+}
+
+/* 添加任务弹窗 */
+.add-task-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: slideUp 0.3s;
+}
+
+.modal-header {
+  padding: 30rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.task-input {
+  width: 100%;
+  height: 88rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  margin-bottom: 20rpx;
+  box-sizing: border-box;
+}
+
+.task-notes {
+  width: 100%;
+  height: 200rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  padding: 20rpx 30rpx;
+  display: flex;
+  gap: 20rpx;
+  border-top: 1rpx solid var(--border-color);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60rpx 0;
+  color: var(--text-color-light);
+  font-size: 28rpx;
+}
+
+/* 在现有样式中添加 */
+.date-input-group {
+  margin-bottom: 20rpx;
+}
+
+.date-input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.date-input-content {
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #eee;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  margin-top: 10rpx;
+}
+
+.date-input {
+  flex: 1;
+  height: 80rpx;
+  font-size: 28rpx;
+}
+
+.date-picker {
+  padding: 20rpx;
+  color: #666;
+}
+
+.date-error {
+  color: #e74c3c;
+  font-size: 24rpx;
+  margin-top: 10rpx;
+}
+
+/* 修改日期时间输入相关样式 */
+.datetime-inputs {
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 10rpx;
+}
+
+.time-section {
+  margin-bottom: 20rpx;
+}
+
+.time-section:last-child {
+  margin-bottom: 0;
+}
+
+.time-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  background: #fff;
+  border-radius: 6rpx;
+  padding: 10rpx;
+}
+
+/* 修改时间输入样式 */
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 12rpx;
+  margin-bottom: 10rpx;
+}
+
+.time-emoji {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+
+/* 基础时间输入框样式 */
+.time-unit {
+  height: 64rpx;
+  background: #fff;
+  border-radius: 6rpx;
+  text-align: center;
+  font-size: 26rpx;
+  padding: 0;
+}
+
+/* 根据内容设置不同宽度 */
+.time-unit.year {
+  width: 100rpx; /* 年份需要4位数 */
+}
+
+.time-unit.month,
+.time-unit.day {
+  width: 70rpx; /* 月份和日期是2位数 */
+}
+
+.time-unit.hour,
+.time-unit.minute {
+  width: 60rpx; /* 小时和分钟是2位数但数字较小 */
+}
+
+/* 隐藏输入框的上下箭头 */
+.time-unit {
+  -webkit-appearance: none;
+}
+
+.time-unit::-webkit-inner-spin-button,
+.time-unit::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 设置placeholder的样式 */
+.time-unit::placeholder {
+  color: #999;
+  font-size: 24rpx;
+}
+
+.date-unit {
+  color: #999;
+  font-size: 24rpx;
+  padding: 0 4rpx;
+}
+
+/* 备注编辑器样式 */
+.markdown-editor {
+  width: 100%;
+  min-height: 200rpx;
+  background: #fff;
+  border-radius: 6rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* 任务详情模态框样式 */
+.task-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.task-detail-modal .modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  animation: fadeIn 0.3s;
+}
+
+.task-detail-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.detail-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.detail-title.important {
+  color: var(--error-color);
+}
+
+.detail-section {
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: var(--text-color);
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.section-content {
+  font-size: 28rpx;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+/* 时间范围显示 */
+.time-range {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  margin-top: 12rpx;
+}
+
+.time-emoji {
+  font-size: 24rpx;
+}
+
+.time-container {
+  flex: 1;
+  position: relative;
+  height: 4rpx;
+  background: #eee;
+  border-radius: 2rpx;
+}
+
+.time-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 2rpx;
+  transition: width 0.3s;
+}
+
+.time-text {
+  position: absolute;
+  top: 12rpx;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-color-light);
+}
+
+/* 时间输入样式 */
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 12rpx;
+  margin-bottom: 10rpx;
+}
+
+.time-unit {
+  height: 64rpx;
+  background: #fff;
+  border-radius: 6rpx;
+  text-align: center;
+  font-size: 26rpx;
+  padding: 0;
+  border: 1rpx solid var(--border-color);
+}
+
+.time-unit.year {
+  width: 100rpx;
+}
+
+.time-unit.month,
+.time-unit.day {
+  width: 70rpx;
+}
+
+.time-unit.hour,
+.time-unit.minute {
+  width: 60rpx;
+}
+
+/* 编辑和删除按钮 */
+.modal-footer {
+  display: flex;
+  padding: 20rpx;
+  gap: 20rpx;
+}
+
+.edit-btn,
+.delete-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+
+.edit-btn {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.delete-btn {
+  background: var(--error-color);
+  color: #fff;
+}
+
+.edit-btn:active,
+.delete-btn:active {
+  opacity: 0.8;
+}
+
+/* 错误提示 */
+.error-text {
+  color: var(--error-color);
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+
+/* 占位符样式 */
+.placeholder {
+  color: var(--text-color-light);
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  right: 30rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40rpx;
+  color: var(--text-color-light);
+  padding: 0 20rpx;
+} 
