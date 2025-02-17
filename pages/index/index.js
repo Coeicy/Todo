@@ -165,19 +165,17 @@ Page({
     }
   },
 
+  // 添加任务按钮点击事件
+  onAddTask() {
+    wx.navigateTo({
+      url: '/pages/task/add/index'
+    })
+  },
+
   // 显示添加任务弹窗
   showAddTask() {
-    this.setData({
-      showAddTaskModal: true,
-      newTask: {
-        title: '',
-        notes: '',
-        important: false,
-        startTime: '',
-        dueDate: '',
-        location: '',
-        url: ''
-      }
+    wx.navigateTo({
+      url: '/pages/task/add/index'
     })
   },
 

@@ -62,4 +62,33 @@
   color: #999;
   font-size: 28rpx;
   padding: 40rpx 0;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.time-line {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.time-dot {
+  font-size: 20rpx;
+}
+
+.time-dot.start {
+  color: #52c41a;
+}
+
+.time-dot.end {
+  color: #ff4d4f;
+}
+
+.time-text {
+  font-size: 24rpx;
+  color: #666;
 } 

@@ -1,73 +1,344 @@
 .container {
-  padding: 20rpx;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f7f7f7;
+  padding: 24rpx;
 }
 
 .form {
   flex: 1;
 }
 
+/* 卡片样式 */
+.form-group {
+  margin-bottom: 32rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+}
+
+.form-group:hover {
+  transform: translateY(-2rpx);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+}
+
 .form-item {
-  margin-bottom: 20rpx;
+  padding: 0 32rpx;
+  position: relative;
+  min-height: 108rpx;
+  display: flex;
+  align-items: center;
+  background: #fff;
 }
 
 .input {
-  width: 100%;
+  flex: 1;
   height: 80rpx;
-  border: 1px solid #e8e8e8;
-  border-radius: 6rpx;
-  padding: 0 20rpx;
-  font-size: 28rpx;
+  border: none;
+  color: #333;
+  font-size: 30rpx;
+  padding: 0;
+  width: 100%;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.input:focus {
+  background: #f8f8f8;
 }
 
 .textarea {
-  width: 100%;
+  flex: 1;
   height: 160rpx;
-  border: 1px solid #e8e8e8;
-  border-radius: 6rpx;
-  padding: 20rpx;
-  font-size: 28rpx;
+  border: none;
+  color: #333;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+  width: 100%;
+  line-height: 1.6;
+  transition: all 0.3s;
 }
 
-.picker, .location-picker {
-  height: 80rpx;
-  border: 1px solid #e8e8e8;
-  border-radius: 6rpx;
-  padding: 0 20rpx;
+.textarea:focus {
+  background: #f8f8f8;
+}
+
+.picker, .location-picker, .upload-box {
+  flex: 1;
   display: flex;
   align-items: center;
+  min-height: 100rpx;
+  padding: 4rpx 0;
 }
 
 .label {
-  font-size: 28rpx;
-  color: #666;
-  margin-right: 20rpx;
+  font-size: 30rpx;
+  color: #333;
+  width: 160rpx;
 }
 
 .value {
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #333;
+  flex: 1;
+}
+
+.value.placeholder {
+  color: #999;
 }
 
 .switch-item {
   display: flex;
   align-items: center;
+  height: 100rpx;
+  padding: 0 32rpx;
+  background: #fff;
+  justify-content: space-between;
+  transition: background-color 0.3s;
 }
 
-.switch-label {
-  font-size: 28rpx;
-  color: #666;
-  margin-left: 20rpx;
+.switch-item:active {
+  background: #f8f9fa;
 }
 
-.footer {
+/* 分组标题 */
+.group-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  padding: 24rpx 32rpx;
+  background: #fff;
+  position: relative;
+  border-bottom: 1rpx solid #ebedf0;
   display: flex;
-  gap: 20rpx;
-  padding: 30rpx 0;
+  align-items: center;
+  gap: 12rpx;
 }
 
-.footer .btn {
+.group-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4rpx;
+  height: 32rpx;
+  background: #07c160;
+  border-radius: 2rpx;
+}
+
+/* 分割线 */
+.form-item::after {
+  content: '';
+  position: absolute;
+  left: 32rpx;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #ebedf0;
+  transform: scaleY(0.5);
+  opacity: 0.8;
+}
+
+/* 移除最后一个分割线 */
+.form-group .form-item:last-child::after {
+  display: none;
+}
+
+/* 输入框占位符颜色 */
+.input::placeholder,
+.textarea::placeholder {
+  color: #999;
+  font-size: 30rpx;
+}
+
+/* switch 样式调整 */
+switch {
+  transform: scale(0.9);
+  margin-left: 16rpx;
+}
+
+/* 地点输入框样式 */
+.location-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16rpx;
+}
+
+.location-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f0f2f5;
+  border-radius: 8rpx;
+  margin-right: 8rpx;
+  transition: all 0.2s;
+}
+
+.location-icon {
+  font-size: 36rpx;
+  color: #666;
+}
+
+.location-btn:active {
+  transform: scale(0.95);
+  background: #e6e8eb;
+}
+
+/* 调整输入框样式 */
+.location-wrapper .input {
   flex: 1;
+}
+
+/* 上传按钮样式 */
+.upload-box {
+  min-height: 88rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  margin: 16rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  border: 2rpx dashed #d9d9d9;
+}
+
+.upload-box:hover {
+  border-color: #1890ff;
+  background: #f0f7ff;
+}
+
+/* 链接输入框样式 */
+.link-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16rpx;
+}
+
+.link-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f0f2f5;
+  border-radius: 8rpx;
+  margin-right: 8rpx;
+  transition: all 0.2s;
+}
+
+.link-icon {
+  font-size: 36rpx;
+  color: #666;
+}
+
+.link-btn:active {
+  transform: scale(0.95);
+  background: #e6e8eb;
+}
+
+/* 调整输入框样式 */
+.link-wrapper .input {
+  flex: 1;
+}
+
+/* 时间输入框样式 */
+.time-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  width: 100%;
+  padding: 16rpx 0;
+}
+
+.time-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  transition: all 0.3s;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.time-row:hover {
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.time-dot {
+  font-size: 24rpx;
+}
+
+.time-dot.start {
+  color: #13c2c2;
+}
+
+.time-dot.end {
+  color: #f5222d;
+}
+
+.time-label {
+  font-size: 30rpx;
+  color: #333;
+  white-space: nowrap;
+  min-width: 120rpx;
+}
+
+.time-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+  gap: 16rpx;
+}
+
+.time-input {
+  height: 64rpx;
+  border: none;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  color: #333;
+  text-align: center;
+  padding: 0 8rpx;
+  transition: all 0.3s;
+}
+
+.time-input:focus {
+  background: #f0f2f5;
+}
+
+.time-input.year {
+  width: 100rpx;
+}
+
+.time-input.month,
+.time-input.day,
+.time-input.hour,
+.time-input.minute {
+  width: 64rpx;
+}
+
+.time-input::placeholder {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 分隔符样式优化 */
+.separator {
+  color: #999;
+  font-size: 28rpx;
+  opacity: 0.8;
+  padding: 0 4rpx;
 } 

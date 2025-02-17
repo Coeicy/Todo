@@ -12,8 +12,17 @@
       </view>
       <view class="task-content">
         <view class="task-title">{{item.title}}</view>
-        <view class="task-info" wx:if="{{item.dueDate || item.location}}">
-          <text wx:if="{{item.dueDate}}">⏰ {{item.dueDate}}</text>
+        <view class="task-info" wx:if="{{item.startTime || item.endTime || item.location}}">
+          <view class="time-info" wx:if="{{item.startTime || item.endTime}}">
+            <view class="time-line" wx:if="{{item.startTime}}">
+              <text class="time-dot start">●</text>
+              <text class="time-text">{{item.startTime}}</text>
+            </view>
+            <view class="time-line" wx:if="{{item.endTime}}">
+              <text class="time-dot end">●</text>
+              <text class="time-text">{{item.endTime}}</text>
+            </view>
+          </view>
           <text wx:if="{{item.location}}">📍 {{item.location}}</text>
         </view>
       </view>

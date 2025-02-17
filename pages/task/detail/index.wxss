@@ -202,4 +202,33 @@
   to {
     transform: translateY(0);
   }
+}
+
+.time-range {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.time-line {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.time-dot {
+  font-size: 24rpx;
+}
+
+.time-dot.start {
+  color: #52c41a;
+}
+
+.time-dot.end {
+  color: #ff4d4f;
+}
+
+.time-text {
+  font-size: 28rpx;
+  color: #333;
 } 

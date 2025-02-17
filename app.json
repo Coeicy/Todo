@@ -56,6 +56,9 @@
   "permission": {
     "scope.notification": {
       "desc": "用于发送任务提醒"
+    },
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于任务地点的导航"
     }
   },
   "requiredPrivateInfos": [

@@ -10,39 +10,56 @@ class DB {
         title: '欢迎使用 WeTodo',
         notes: '这是一个示例任务',
         important: true,
-        dueDate: new Date().toISOString()
       })
     }
   }
 
-  getTasks() {
-    return this.tasks
-  }
-
-  createTask(task) {
-    const newTask = {
+  addTask(taskData) {
+    const task = {
       id: Date.now().toString(),
-      title: task.title,
-      notes: task.notes || '',
-      important: task.important || false,
+      title: taskData.title,
+      notes: taskData.notes || '',
+      startTime: taskData.startTime || null,
+      endTime: taskData.endTime || null,
+      location: taskData.location || '',
+      url: taskData.url || '',
+      important: taskData.important || false,
       completed: false,
-      startTime: task.startTime || null,
-      dueDate: task.dueDate || null,
-      location: task.location || '',
-      url: task.url || '',
-      createTime: new Date().toISOString()
+      createTime: new Date().toISOString(),
+      updateTime: new Date().toISOString()
     }
-    this.tasks.unshift(newTask)
+    
+    this.tasks.unshift(task)
     this._save()
-    return newTask
+    return task
   }
 
-  addTask(task) {
-    return this.createTask(task)
+  getTasks(filter = {}) {
+    let tasks = [...this.tasks]
+    
+    if (filter.completed !== undefined) {
+      tasks = tasks.filter(t => t.completed === filter.completed)
+    }
+    if (filter.important !== undefined) {
+      tasks = tasks.filter(t => t.important === filter.important) 
+    }
+    if (filter.date) {
+      tasks = tasks.filter(t => {
+        const taskDate = new Date(t.dueDate).toDateString()
+        const filterDate = new Date(filter.date).toDateString()
+        return taskDate === filterDate
+      })
+    }
+
+    return tasks
   }
 
-  updateTask(taskId, updates) {
-    const index = this.tasks.findIndex(t => t.id === taskId)
+  getTask(id) {
+    return this.tasks.find(t => t.id === id)
+  }
+
+  updateTask(id, updates) {
+    const index = this.tasks.findIndex(t => t.id === id)
     if (index > -1) {
       this.tasks[index] = {
         ...this.tasks[index],
@@ -70,4 +87,4 @@ class DB {
   }
 }
 
-module.exports = new DB() 
+export default new DB() 

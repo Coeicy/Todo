@@ -15,12 +15,17 @@
 
     <!-- 任务信息 -->
     <view class="task-info">
-      <view class="info-item" wx:if="{{task.startTime || task.dueDate}}">
+      <view class="info-item" wx:if="{{task.startTime || task.endTime}}">
         <view class="label">⏰ 时间</view>
-        <view class="value">
-          <text wx:if="{{task.startTime}}">{{task.startTime}}</text>
-          <text wx:if="{{task.startTime && task.dueDate}}"> - </text>
-          <text wx:if="{{task.dueDate}}">{{task.dueDate}}</text>
+        <view class="value time-range">
+          <view class="time-line" wx:if="{{task.startTime}}">
+            <text class="time-dot start">●</text>
+            <text class="time-text">开始：{{task.startTime}}</text>
+          </view>
+          <view class="time-line" wx:if="{{task.endTime}}">
+            <text class="time-dot end">●</text>
+            <text class="time-text">结束：{{task.endTime}}</text>
+          </view>
         </view>
       </view>
 

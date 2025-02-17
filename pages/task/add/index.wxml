@@ -1,76 +1,171 @@
 <view class="container">
-  <view class="form card">
-    <!-- 标题输入 -->
-    <view class="form-item">
-      <input class="input" 
-             placeholder="任务标题" 
-             value="{{form.title}}"
-             data-field="title"
-             bindinput="onInput"/>
-    </view>
-
-    <!-- 备注输入 -->
-    <view class="form-item">
-      <textarea class="textarea" 
-                placeholder="备注" 
-                value="{{form.notes}}"
-                data-field="notes"
-                bindinput="onInput"/>
-    </view>
-
-    <!-- 时间选择 -->
-    <view class="form-item">
-      <picker mode="date" 
-              value="{{form.startTime}}"
-              data-field="startTime"
-              bindchange="onInput">
-        <view class="picker">
-          <text class="label">开始时间：</text>
-          <text class="value">{{form.startTime || '请选择'}}</text>
-        </view>
-      </picker>
-    </view>
-
-    <view class="form-item">
-      <picker mode="date" 
-              value="{{form.dueDate}}"
-              data-field="dueDate"
-              bindchange="onInput">
-        <view class="picker">
-          <text class="label">截止时间：</text>
-          <text class="value">{{form.dueDate || '请选择'}}</text>
-        </view>
-      </picker>
-    </view>
-
-    <!-- 地点选择 -->
-    <view class="form-item">
-      <view class="location-picker" bindtap="chooseLocation">
-        <text class="label">地点：</text>
-        <text class="value">{{form.location || '点击选择'}}</text>
+  <view class="form">
+    <view class="form-group">
+      <view class="group-title">📝 准备做什么？</view>
+      <view class="form-item">
+        <input class="input" 
+               placeholder="在这里输入" 
+               value="{{form.title}}"
+               data-field="title"
+               bindinput="onInput"/>
       </view>
     </view>
 
-    <!-- 链接输入 -->
-    <view class="form-item">
-      <input class="input" 
-             placeholder="相关链接" 
-             value="{{form.url}}"
-             data-field="url"
-             bindinput="onInput"/>
+    <view class="form-group">
+      <view class="group-title">⭐ 重要程度</view>
+      <view class="switch-item">
+        <text class="value">标记为重要任务</text>
+        <switch checked="{{form.important}}" 
+                bindchange="toggleImportant"/>
+      </view>
     </view>
 
-    <!-- 重要标记 -->
-    <view class="form-item switch-item">
-      <switch checked="{{form.important}}" 
-              bindchange="toggleImportant"/>
-      <text class="switch-label">标记为重要</text>
+    <view class="form-group">
+      <view class="group-title">⏰ 任务时间</view>
+      <view class="form-item">
+        <view class="time-inputs">
+          <view class="time-row">
+            <text class="time-dot start">●</text>
+            <view class="time-input-group">
+              <input class="time-input year" 
+                     placeholder="年" 
+                     value="{{form.startYear}}"
+                     maxlength="4"
+                     type="number"
+                     data-field="startYear"
+                     bindinput="onTimeInput"/>
+              <text class="separator">-</text>
+              <input class="time-input month" 
+                     placeholder="月" 
+                     value="{{form.startMonth}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="startMonth"
+                     bindinput="onTimeInput"/>
+              <text class="separator">-</text>
+              <input class="time-input day" 
+                     placeholder="日" 
+                     value="{{form.startDay}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="startDay"
+                     bindinput="onTimeInput"/>
+              <text class="separator">  </text>
+              <input class="time-input hour" 
+                     placeholder="时" 
+                     value="{{form.startHour}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="startHour"
+                     bindinput="onTimeInput"/>
+              <text class="separator">:</text>
+              <input class="time-input minute" 
+                     placeholder="分" 
+                     value="{{form.startMinute}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="startMinute"
+                     bindinput="onTimeInput"/>
+            </view>
+          </view>
+          <view class="time-row">
+            <text class="time-dot end">●</text>
+            <view class="time-input-group">
+              <input class="time-input year" 
+                     placeholder="年" 
+                     value="{{form.endYear}}"
+                     maxlength="4"
+                     type="number"
+                     data-field="endYear"
+                     bindinput="onTimeInput"/>
+              <text class="separator">-</text>
+              <input class="time-input month" 
+                     placeholder="月" 
+                     value="{{form.endMonth}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="endMonth"
+                     bindinput="onTimeInput"/>
+              <text class="separator">-</text>
+              <input class="time-input day" 
+                     placeholder="日" 
+                     value="{{form.endDay}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="endDay"
+                     bindinput="onTimeInput"/>
+              <text class="separator">  </text>
+              <input class="time-input hour" 
+                     placeholder="时" 
+                     value="{{form.endHour}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="endHour"
+                     bindinput="onTimeInput"/>
+              <text class="separator">:</text>
+              <input class="time-input minute" 
+                     placeholder="分" 
+                     value="{{form.endMinute}}"
+                     maxlength="2"
+                     type="number"
+                     data-field="endMinute"
+                     bindinput="onTimeInput"/>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
-  </view>
 
-  <!-- 底部按钮 -->
-  <view class="footer">
-    <button class="btn btn-default" bindtap="cancel">取消</button>
-    <button class="btn btn-primary" bindtap="submitForm">创建</button>
+    <view class="form-group">
+      <view class="group-title">📍 任务地点</view>
+      <view class="form-item">
+        <view class="location-wrapper">
+          <input class="input" 
+                 placeholder="输入地点" 
+                 value="{{form.location}}"
+                 data-field="location"
+                 bindinput="onInput"/>
+          <view class="location-btn" bindtap="navigateToLocation">
+            <text class="location-icon">🗺️</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="group-title">📌 备注信息</view>
+      <view class="form-item">
+        <textarea class="textarea" 
+                  placeholder="备注" 
+                  value="{{form.notes}}"
+                  data-field="notes"
+                  bindinput="onInput"/>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="group-title">🔗 相关链接</view>
+      <view class="form-item">
+        <view class="link-wrapper">
+          <input class="input" 
+                 placeholder="请输入链接地址" 
+                 value="{{form.url}}"
+                 data-field="url"
+                 bindinput="onInput"/>
+          <view class="link-btn" bindtap="openUrl">
+            <text class="link-icon">🔗</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="group-title">📂 任务附件</view>
+      <view class="form-item">
+        <view class="upload-box" bindtap="chooseFile">
+          <text class="value placeholder">点击上传附件</text>
+        </view>
+      </view>
+    </view>
   </view>
 </view> 
