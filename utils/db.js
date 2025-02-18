@@ -24,15 +24,24 @@ class DB {
     return this.tasks
   }
 
-  addTask(task) {
+  addTask(taskData) {
     if (!this.initialized) {
       this.init()
     }
     
     const newTask = {
       id: Date.now().toString(),
-      ...task,
-      createdAt: new Date().toISOString()
+      title: taskData.title || '',
+      notes: taskData.notes || '',
+      priority: taskData.priority || 0,
+      startTime: taskData.startTime || null,
+      dueDate: taskData.dueDate || null,
+      location: taskData.location || '',
+      url: taskData.url || '',
+      completed: false,
+      important: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
     
     this.tasks.unshift(newTask)
@@ -67,11 +76,19 @@ class DB {
     this.saveTasks()
   }
 
+  getTask(id) {
+    if (!this.initialized) {
+      this.init()
+    }
+    return this.tasks.find(t => t.id === id)
+  }
+
   saveTasks() {
     try {
       wx.setStorageSync('tasks', this.tasks)
     } catch (error) {
       console.error('保存任务失败:', error)
+      throw error // 抛出错误以便上层处理
     }
   }
 }
