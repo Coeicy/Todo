@@ -12,7 +12,28 @@
       id: string,          // 任务ID
       title: string,       // 任务标题
       notes: string,       // 任务备注
-      dueDate: string,     // 截止日期
+      startTime: {         // 开始时间
+        year: string,
+        month: string, 
+        day: string,
+        hour: string,
+        minute: string
+      },
+      endTime: {          // 结束时间
+        year: string,
+        month: string,
+        day: string, 
+        hour: string,
+        minute: string
+      },
+      location: string,    // 任务地点
+      url: string,         // 相关链接
+      attachments: [{      // 任务附件
+        name: string,
+        url: string,
+        size: number,
+        type: string
+      }],
       important: boolean,  // 是否重要
       completed: boolean,  // 是否完成
       createTime: string,  // 创建时间
@@ -45,11 +66,20 @@ interface Task {
   id: string;          // 任务ID
   title: string;       // 任务标题
   notes?: string;      // 任务备注
-  dueDate?: string;    // 截止日期
-  important: boolean;  // 是否重要
-  completed: boolean;  // 是否完成
-  createTime: string;  // 创建时间
-  updateTime: string;  // 更新时间
+  startTime?: object;  // 开始时间
+  endTime?: object;    // 结束时间
+  location?: string;   // 任务地点
+  url?: string;         // 相关链接
+  attachments?: [{     // 任务附件
+    name: string;
+    url: string;
+    size: number;
+    type: string;
+  }];
+  important: boolean;    // 是否重要
+  completed: boolean;    // 是否完成
+  createTime: string;     // 创建时间
+  updateTime: string;     // 更新时间
   completedTime?: string; // 完成时间
 }
 ```
@@ -59,23 +89,43 @@ interface Task {
 ### 任务管理
 ```js
 // 添加任务
-db.addTask(taskData)
+db.addTask({
+  title: string,
+  notes?: string,
+  startTime?: object,
+  endTime?: object,
+  location?: string,
+  url?: string,
+  important?: boolean
+})
 
 // 更新任务
-db.updateTask(taskId, data)
+db.updateTask(id, {
+  title?: string,
+  notes?: string,
+  startTime?: object,
+  endTime?: object,
+  location?: string,
+  url?: string,
+  important?: boolean,
+  completed?: boolean
+})
 
 // 删除任务
-db.deleteTask(taskId)
+db.deleteTask(id)
 
 // 获取任务列表
-db.getTasks(filter?)
+db.getTasks()
 
 // 获取任务详情
-db.getTask(taskId)
+db.getTask(id)
 ```
 
 ### 数据过滤
 ```js
+// 获取今日任务
+db.getTodayTasks()
+
 // 获取重要任务
 db.getImportantTasks()
 
@@ -85,24 +135,3 @@ db.getCompletedTasks()
 // 获取指定日期的任务
 db.getTasksByDate(date)
 ```
-
-### 数据统计
-```js
-// 获取任务统计
-db.getTaskStats()
-
-// 获取每日任务完成情况
-db.getDailyStats()
-```
-
-## 性能优化
-
-### 存储优化
-- 定期清理过期数据
-- 控制存储数据量
-- 优化查询性能
-
-### 缓存策略
-- 缓存常用数据
-- 延迟写入
-- 批量更新 

@@ -8,9 +8,9 @@ App({
   },
 
   onLaunch() {
-    // 确保数据库最先初始化
-    db.init()
+    // 初始化数据库
     this.globalData.db = db
+    db.init()
     
     // 获取系统信息
     const systemInfo = wx.getSystemInfoSync()

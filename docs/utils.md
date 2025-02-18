@@ -16,13 +16,29 @@ db.init()
 const task = db.addTask({
   title: '任务标题',
   notes: '备注',
-  important: false,
-  dueDate: '2024-01-01'
+  startTime: {
+    year: '2024',
+    month: '01',
+    day: '01',
+    hour: '09',
+    minute: '00'
+  },
+  endTime: {
+    year: '2024',
+    month: '01',
+    day: '01',
+    hour: '10',
+    minute: '00'
+  },
+  location: '地点',
+  url: 'https://example.com',
+  important: false
 })
 
 // 更新任务
 db.updateTask(taskId, {
-  title: '新标题'
+  title: '新标题',
+  completed: true
 })
 
 // 删除任务
@@ -156,4 +172,13 @@ const debounced = util.debounce(fn, 300)
 
 // 节流函数
 const throttled = util.throttle(fn, 300)
+
+// 格式化时间
+util.formatDateTime(date)
+
+// 格式化任务时间
+util.formatTaskTime(startTime, endTime)
+
+// 格式化文件大小
+util.formatFileSize(size)
 ``` 

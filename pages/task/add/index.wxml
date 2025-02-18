@@ -1,27 +1,50 @@
 <view class="container">
   <view class="form">
     <view class="form-group">
+      <view class="group-title">✨ 优先级</view>
+      <view class="priority-item">
+        <view class="priority-buttons">
+          <view class="priority-btn {{form.priority === 0 ? 'active' : ''}}" 
+                data-priority="0"
+                bindtap="setPriority">
+            😐
+          </view>
+          <view class="priority-btn {{form.priority === 1 ? 'active' : ''}}"
+                data-priority="1" 
+                bindtap="setPriority">
+            🙂
+          </view>
+          <view class="priority-btn {{form.priority === 2 ? 'active' : ''}}"
+                data-priority="2"
+                bindtap="setPriority">
+            😟
+          </view>
+          <view class="priority-btn {{form.priority === 3 ? 'active' : ''}}"
+                data-priority="3"
+                bindtap="setPriority">
+            😨
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
       <view class="group-title">📝 准备做什么？</view>
       <view class="form-item">
-        <input class="input" 
-               placeholder="在这里输入" 
-               value="{{form.title}}"
-               data-field="title"
-               bindinput="onInput"/>
+        <textarea class="input" 
+                  placeholder="任务标题" 
+                  value="{{form.title}}"
+                  data-field="title"
+                  auto-height
+                  show-confirm-bar="{{false}}"
+                  adjust-position="{{false}}"
+                  maxlength="-1"
+                  bindinput="onInput"/>
       </view>
     </view>
 
     <view class="form-group">
-      <view class="group-title">⭐ 重要程度</view>
-      <view class="switch-item">
-        <text class="value">标记为重要任务</text>
-        <switch checked="{{form.important}}" 
-                bindchange="toggleImportant"/>
-      </view>
-    </view>
-
-    <view class="form-group">
-      <view class="group-title">⏰ 任务时间</view>
+      <view class="group-title">⏰ 什么时候？</view>
       <view class="form-item">
         <view class="time-inputs">
           <view class="time-row">
@@ -30,42 +53,32 @@
               <input class="time-input year" 
                      placeholder="年" 
                      value="{{form.startYear}}"
-                     maxlength="4"
-                     type="number"
                      data-field="startYear"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">-</text>
               <input class="time-input month" 
-                     placeholder="月" 
+                     placeholder="月"
                      value="{{form.startMonth}}"
-                     maxlength="2"
-                     type="number"
-                     data-field="startMonth"
-                     bindinput="onTimeInput"/>
+                     data-field="startMonth" 
+                     bindinput="onInput"/>
               <text class="separator">-</text>
-              <input class="time-input day" 
-                     placeholder="日" 
+              <input class="time-input day"
+                     placeholder="日"
                      value="{{form.startDay}}"
-                     maxlength="2"
-                     type="number"
                      data-field="startDay"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">  </text>
-              <input class="time-input hour" 
-                     placeholder="时" 
+              <input class="time-input hour"
+                     placeholder="时"
                      value="{{form.startHour}}"
-                     maxlength="2"
-                     type="number"
                      data-field="startHour"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">:</text>
-              <input class="time-input minute" 
-                     placeholder="分" 
+              <input class="time-input minute"
+                     placeholder="分"
                      value="{{form.startMinute}}"
-                     maxlength="2"
-                     type="number"
                      data-field="startMinute"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
             </view>
           </view>
           <view class="time-row">
@@ -74,42 +87,32 @@
               <input class="time-input year" 
                      placeholder="年" 
                      value="{{form.endYear}}"
-                     maxlength="4"
-                     type="number"
                      data-field="endYear"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">-</text>
               <input class="time-input month" 
                      placeholder="月" 
                      value="{{form.endMonth}}"
-                     maxlength="2"
-                     type="number"
                      data-field="endMonth"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">-</text>
               <input class="time-input day" 
                      placeholder="日" 
                      value="{{form.endDay}}"
-                     maxlength="2"
-                     type="number"
                      data-field="endDay"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">  </text>
               <input class="time-input hour" 
                      placeholder="时" 
                      value="{{form.endHour}}"
-                     maxlength="2"
-                     type="number"
                      data-field="endHour"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
               <text class="separator">:</text>
               <input class="time-input minute" 
                      placeholder="分" 
                      value="{{form.endMinute}}"
-                     maxlength="2"
-                     type="number"
                      data-field="endMinute"
-                     bindinput="onTimeInput"/>
+                     bindinput="onInput"/>
             </view>
           </view>
         </view>
@@ -117,55 +120,100 @@
     </view>
 
     <view class="form-group">
-      <view class="group-title">📍 任务地点</view>
-      <view class="form-item">
-        <view class="location-wrapper">
-          <input class="input" 
-                 placeholder="输入地点" 
-                 value="{{form.location}}"
-                 data-field="location"
-                 bindinput="onInput"/>
-          <view class="location-btn" bindtap="navigateToLocation">
-            <text class="location-icon">🗺️</text>
-          </view>
+      <view class="group-title">
+        <text>📍 在哪里？</text>
+        <view class="location-btn" bindtap="chooseLocation">
+          <text>🗺️</text>
         </view>
       </view>
-    </view>
-
-    <view class="form-group">
-      <view class="group-title">📌 备注信息</view>
       <view class="form-item">
-        <textarea class="textarea" 
-                  placeholder="备注" 
-                  value="{{form.notes}}"
-                  data-field="notes"
+        <textarea class="input" 
+                  placeholder="任务地点" 
+                  value="{{form.location}}"
+                  data-field="location"
+                  auto-height
+                  maxlength="-1"
                   bindinput="onInput"/>
       </view>
     </view>
 
     <view class="form-group">
-      <view class="group-title">🔗 相关链接</view>
+      <view class="group-title">📝 备注</view>
       <view class="form-item">
-        <view class="link-wrapper">
-          <input class="input" 
-                 placeholder="请输入链接地址" 
-                 value="{{form.url}}"
-                 data-field="url"
-                 bindinput="onInput"/>
-          <view class="link-btn" bindtap="openUrl">
-            <text class="link-icon">🔗</text>
-          </view>
-        </view>
+        <textarea class="input" 
+                  placeholder="备注信息" 
+                  value="{{form.notes}}"
+                  data-field="notes"
+                  auto-height
+                  maxlength="-1"
+                  bindinput="onInput"/>
       </view>
     </view>
 
     <view class="form-group">
-      <view class="group-title">📂 任务附件</view>
+      <view class="group-title">
+        <text>🔗 相关链接</text>
+        <view class="link-btn" bindtap="openUrl">
+          <text>🌐</text>
+        </view>
+      </view>
       <view class="form-item">
-        <view class="upload-box" bindtap="chooseFile">
-          <text class="value placeholder">点击上传附件</text>
+        <input class="input" 
+               placeholder="相关链接" 
+               value="{{form.url}}"
+               data-field="url"
+               bindinput="onInput"/>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="group-title">
+        <text>📂 附件</text>
+        <view class="attach-btn" bindtap="showUploadActionSheet">
+          <text>➕</text>
+        </view>
+      </view>
+      <view class="form-item">
+        <view class="attachment-list">
+          <block wx:if="{{attachments.length > 0}}">
+            <view class="attachment-item" 
+                  wx:for="{{attachments}}" 
+                  wx:key="id"
+                  bindtap="previewAttachment"
+                  data-attachment="{{item}}">
+              <!-- 预览图/图标 -->
+              <view class="attachment-preview">
+                <image wx:if="{{item.type === 'image'}}" 
+                       src="{{item.path}}" 
+                       mode="aspectFill"/>
+                <text wx:else class="file-icon">📄</text>
+              </view>
+              <!-- 文件信息 -->
+              <view class="attachment-info">
+                <text class="attachment-name">{{item.name}}</text>
+                <text class="attachment-size">{{item.size}}</text>
+              </view>
+              <!-- 删除按钮 -->
+              <view class="attachment-delete" 
+                    catchtap="deleteAttachment" 
+                    data-id="{{item.id}}">
+                <text>×</text>
+              </view>
+            </view>
+          </block>
+          <view wx:else class="empty-tip">暂无附件</view>
         </view>
       </view>
     </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer-buttons">
+    <button class="btn cancel" bindtap="cancel">
+      取消
+    </button>
+    <button class="btn confirm" bindtap="submitForm" loading="{{submitLoading}}">
+      确定
+    </button>
   </view>
 </view> 

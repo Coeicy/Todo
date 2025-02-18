@@ -1,0 +1,161 @@
+<view class="container">
+  <!-- 顶部统计和按钮组 -->
+  <view class="header">
+    <view class="stats">
+      <view class="stat-item">
+        <text class="stat-num">{{totalCount}}</text>
+        <text class="stat-label">总任务</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{doneCount}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{importantCount}}</text>
+        <text class="stat-label">重要</text>
+      </view>
+    </view>
+
+    <view class="filter-buttons">
+      <view class="filter-btn {{filter === 'all' ? 'active' : ''}}" 
+            bindtap="setFilter" 
+            data-type="all">
+        全部任务
+      </view>
+      <view class="filter-btn {{filter === 'todo' ? 'active' : ''}}" 
+            bindtap="setFilter" 
+            data-type="todo">
+        未完成
+      </view>
+      <view class="filter-btn {{filter === 'quadrant' ? 'active' : ''}}" 
+            bindtap="setFilter" 
+            data-type="quadrant">
+        象限
+      </view>
+    </view>
+  </view>
+
+  <!-- 任务列表 -->
+  <scroll-view class="task-list" scroll-y enable-flex>
+    <!-- 象限视图 -->
+    <view class="quadrant-view" wx:if="{{filter === 'quadrant'}}">
+      <view class="quadrant-row">
+        <!-- 重要且紧急 -->
+        <view class="quadrant-cell urgent-important">
+          <view class="quadrant-title">重要且紧急</view>
+          <scroll-view class="quadrant-tasks" scroll-y>
+            <block wx:if="{{quadrantTasks.urgentImportant.length > 0}}">
+              <view class="task-item" 
+                    wx:for="{{quadrantTasks.urgentImportant}}" 
+                    wx:key="id"
+                    bindtap="goToTaskDetail"
+                    data-id="{{item.id}}">
+                <view class="task-title">{{item.title}}</view>
+                <view class="task-info" wx:if="{{item.startTime}}">
+                  <text>{{formatTime(item.startTime)}}</text>
+                </view>
+              </view>
+            </block>
+            <view class="empty-tip" wx:else>暂无任务</view>
+          </scroll-view>
+        </view>
+        
+        <!-- 重要不紧急 -->
+        <view class="quadrant-cell important">
+          <view class="quadrant-title">重要不紧急</view>
+          <scroll-view class="quadrant-tasks" scroll-y>
+            <view class="task-item" 
+                  wx:for="{{quadrantTasks.important}}" 
+                  wx:key="id"
+                  bindtap="goToTaskDetail"
+                  data-id="{{item.id}}">
+              <view class="task-title">{{item.title}}</view>
+              <view class="task-info" wx:if="{{item.startTime}}">
+                <text>{{formatTime(item.startTime)}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+      
+      <view class="quadrant-row">
+        <!-- 紧急不重要 -->
+        <view class="quadrant-cell urgent">
+          <view class="quadrant-title">紧急不重要</view>
+          <scroll-view class="quadrant-tasks" scroll-y>
+            <view class="task-item" 
+                  wx:for="{{quadrantTasks.urgent}}" 
+                  wx:key="id"
+                  bindtap="goToTaskDetail"
+                  data-id="{{item.id}}">
+              <view class="task-title">{{item.title}}</view>
+              <view class="task-info" wx:if="{{item.startTime}}">
+                <text>{{formatTime(item.startTime)}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+        
+        <!-- 不重要不紧急 -->
+        <view class="quadrant-cell normal">
+          <view class="quadrant-title">不重要不紧急</view>
+          <scroll-view class="quadrant-tasks" scroll-y>
+            <view class="task-item" 
+                  wx:for="{{quadrantTasks.normal}}" 
+                  wx:key="id"
+                  bindtap="goToTaskDetail"
+                  data-id="{{item.id}}">
+              <view class="task-title">{{item.title}}</view>
+              <view class="task-info" wx:if="{{item.startTime}}">
+                <text>{{formatTime(item.startTime)}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 任务分组 -->
+    <view class="task-group" wx:for="{{taskGroups}}" wx:key="title" wx:for-item="group">
+      <!-- 分组标题 -->
+      <view class="group-title">{{group.title}}</view>
+      
+      <!-- 分组内任务列表 -->
+      <view class="task-item" 
+            wx:for="{{group.tasks}}" 
+            wx:key="id"
+            bindtap="goToTaskDetail"
+            data-id="{{item.id}}">
+        <!-- 优先级标记 -->
+        <view class="priority-mark priority-{{item.priority}}"></view>
+        
+        <!-- 任务主要信息 -->
+        <view class="task-main">
+          <view class="task-title">{{item.title}}</view>
+          <view class="task-info">
+            <text wx:if="{{item.startTime}}">开始：{{formatTime(item.startTime)}}</text>
+            <text wx:if="{{item.endTime}}">结束：{{formatTime(item.endTime)}}</text>
+            <text wx:if="{{item.location}}">地点：{{item.location}}</text>
+          </view>
+        </view>
+        
+        <!-- 删除按钮 -->
+        <view class="delete-btn" 
+              catchtap="deleteTask" 
+              data-id="{{item.id}}">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态提示 -->
+    <view class="empty-tip" wx:if="{{taskGroups.length === 0}}">
+      <text>暂无任务</text>
+    </view>
+  </scroll-view>
+
+  <!-- 添加按钮 -->
+  <view class="add-btn" bindtap="goToAddTask">
+    <text>+</text>
+  </view>
+</view> 

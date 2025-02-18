@@ -1,200 +1,214 @@
+/* 基础布局 */
 .container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #f7f7f7;
   padding: 24rpx;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom)); /* 为底部按钮留出空间 */
+  box-sizing: border-box;
 }
 
 .form {
   flex: 1;
 }
 
-/* 卡片样式 */
+/* 卡片基础样式 */
 .form-group {
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
   background: #fff;
   border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
-  transition: all 0.3s;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
 }
 
-.form-group:hover {
-  transform: translateY(-2rpx);
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+/* 分组标题样式 - 保持醒目 */
+.group-title {
+  padding: 24rpx;
+  font-size: 34rpx;  /* 增大标题字号 */
+  font-weight: 600;  /* 加粗标题 */
+  color: #333;
+  border-bottom: 1rpx solid #f5f5f5;
+  display: flex;
+  align-items: center;
 }
 
+/* 标题文本容器 */
+.group-title text:first-child {
+  margin-right: auto;
+}
+
+/* 表单项容器 */
 .form-item {
-  padding: 0 32rpx;
-  position: relative;
-  min-height: 108rpx;
+  width: 100%;
+  min-height: 88rpx;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  padding: 0 24rpx;
   background: #fff;
+  box-sizing: border-box;
+  flex: 1;
 }
 
-.input {
-  flex: 1;
-  height: 80rpx;
-  border: none;
-  color: #333;
-  font-size: 30rpx;
-  padding: 0;
+/* textarea 输入框基础样式 */
+textarea.input {
   width: 100%;
+  min-height: 88rpx;
+  font-size: 28rpx;
+  font-weight: 400;
+  color: #333;
   background: transparent;
-  transition: all 0.3s;
-}
-
-.input:focus {
-  background: #f8f8f8;
-}
-
-.textarea {
-  flex: 1;
-  height: 160rpx;
   border: none;
-  color: #333;
+  box-sizing: border-box;
   padding: 20rpx 0;
-  font-size: 30rpx;
-  width: 100%;
-  line-height: 1.6;
-  transition: all 0.3s;
+  line-height: 1.4;
 }
 
-.textarea:focus {
-  background: #f8f8f8;
+/* 任务标题输入框特殊样式 */
+textarea[data-field="title"] {
+  font-size: 32rpx;
 }
 
-.picker, .location-picker, .upload-box {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-height: 100rpx;
-  padding: 4rpx 0;
+/* 相关链接输入框样式 */
+input.input {
+  height: 88rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.label {
-  font-size: 30rpx;
-  color: #333;
-  width: 160rpx;
+/* 统一的占位符基础样式 */
+.input::placeholder {
+  color: #cccccc;
+  font-size: 28rpx;
+  font-weight: 300;
+  opacity: 0.7;
+  white-space: nowrap;
 }
 
-.value {
-  font-size: 30rpx;
-  color: #333;
-  flex: 1;
-}
-
-.value.placeholder {
-  color: #999;
-}
-
-.switch-item {
-  display: flex;
-  align-items: center;
-  height: 100rpx;
-  padding: 0 32rpx;
-  background: #fff;
-  justify-content: space-between;
-  transition: background-color 0.3s;
-}
-
-.switch-item:active {
+/* 输入框焦点状态 */
+.form-item:focus-within {
   background: #f8f9fa;
 }
 
-/* 分组标题 */
-.group-title {
-  font-size: 32rpx;
-  color: #333;
-  font-weight: bold;
-  padding: 24rpx 32rpx;
-  background: #fff;
-  position: relative;
-  border-bottom: 1rpx solid #ebedf0;
+/* 输入框焦点时的占位符样式 */
+.input:focus::placeholder {
+  opacity: 0.6;
+  transform: translateY(2rpx);
+  transition: all 0.2s ease;
+}
+
+/* 移除重复的样式定义 */
+textarea[data-field="title"]::placeholder,
+textarea[data-field="notes"]::placeholder,
+.input[data-field="location"]::placeholder,
+.input[data-field="url"]::placeholder {
+  /* 使用统一的基础样式 */
+}
+
+/* 其他输入框统一样式 */
+.input[data-field="location"],
+.input[data-field="notes"],
+.input[data-field="url"] {
+  font-size: 28rpx;
+  padding: 12rpx 0;
+}
+
+/* 其他输入框有内容时的样式 */
+.input[data-field="location"][value],
+.input[data-field="notes"][value],
+.input[data-field="url"][value] {
+  font-weight: 500;
+}
+
+/* 时间输入样式 */
+.time-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  padding: 24rpx 0;  /* 增加上下内边距 */
+}
+
+.time-row {
   display: flex;
   align-items: center;
   gap: 12rpx;
+  padding: 8rpx 24rpx;  /* 增加每行的内边距 */
 }
 
-.group-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4rpx;
-  height: 32rpx;
-  background: #07c160;
-  border-radius: 2rpx;
+.time-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
-/* 分割线 */
-.form-item::after {
-  content: '';
-  position: absolute;
-  left: 32rpx;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: #ebedf0;
-  transform: scaleY(0.5);
+/* 分隔日期和时间的间距 */
+.time-input.hour {
+  margin-left: 30rpx;  /* 增加日期和时间之间的间距到 30rpx */
+}
+
+.time-input {
+  height: 64rpx;  /* 增加输入框高度 */
+  background: #f5f5f5;
+  border-radius: 4rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #333;
+  padding: 0 4rpx;
+}
+
+/* 不同时间单位的宽度 */
+.time-input.year {
+  width: 100rpx;
+}
+
+.time-input.month,
+.time-input.day {
+  width: 64rpx;
+}
+
+.time-input.hour,
+.time-input.minute {
+  width: 64rpx;
+}
+
+/* 分隔符样式 */
+.separator {
+  color: #999;
+  font-size: 28rpx;
   opacity: 0.8;
 }
 
-/* 移除最后一个分割线 */
-.form-group .form-item:last-child::after {
-  display: none;
+/* 开始和结束时间的标记点 */
+.time-dot {
+  font-size: 24rpx;
 }
 
-/* 输入框占位符颜色 */
-.input::placeholder,
-.textarea::placeholder {
-  color: #999;
-  font-size: 30rpx;
+.time-dot.start {
+  color: #52c41a;
 }
 
-/* switch 样式调整 */
-switch {
-  transform: scale(0.9);
-  margin-left: 16rpx;
+.time-dot.end {
+  color: #f5222d;
 }
 
-/* 地点输入框样式 */
-.location-wrapper {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 16rpx;
-}
-
-.location-btn {
-  width: 64rpx;
-  height: 64rpx;
+/* 按钮样式 */
+.location-btn, .link-btn {
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  background: #f0f2f5;
-  border-radius: 8rpx;
-  margin-right: 8rpx;
-  transition: all 0.2s;
-}
-
-.location-icon {
-  font-size: 36rpx;
+  font-size: 32rpx;
   color: #666;
+  transition: all 0.3s ease;
 }
 
-.location-btn:active {
-  transform: scale(0.95);
-  background: #e6e8eb;
-}
-
-/* 调整输入框样式 */
-.location-wrapper .input {
-  flex: 1;
+.location-btn:active, .link-btn:active {
+  transform: scale(0.9);
+  opacity: 0.8;
 }
 
 /* 上传按钮样式 */
@@ -215,130 +229,402 @@ switch {
   background: #f0f7ff;
 }
 
-/* 链接输入框样式 */
-.link-wrapper {
+/* 优先级按钮样式 */
+.priority-buttons {
   display: flex;
-  align-items: center;
-  width: 100%;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;  /* 调整内边距 */
   gap: 16rpx;
 }
 
-.link-btn {
-  width: 64rpx;
-  height: 64rpx;
+.priority-btn {
+  width: 100rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  background: #f0f2f5;
   border-radius: 8rpx;
-  margin-right: 8rpx;
-  transition: all 0.2s;
+  font-size: 36rpx;
+  color: #666;
+  transition: all 0.3s;
+  position: relative;
 }
 
-.link-icon {
-  font-size: 36rpx;
+/* 添加颜色条 */
+.priority-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16rpx;  /* 增加上下间距，让颜色条更短 */
+  bottom: 16rpx;
+  width: 4rpx;
+  border-radius: 2rpx;
+  opacity: 0.8;  /* 增加不透明度 */
+}
+
+/* 不同优先级的颜色 */
+.priority-btn[data-priority="0"]::before {
+  background: #08979c;  /* 更深的青色 - 普通 */
+}
+
+.priority-btn[data-priority="1"]::before {
+  background: #1d39c4;  /* 更深的靛蓝 - 一般 */
+}
+
+.priority-btn[data-priority="2"]::before {
+  background: #c41d7f;  /* 更深的玫红 - 重要 */
+}
+
+.priority-btn[data-priority="3"]::before {
+  background: #cf1322;  /* 更深的红色 - 紧急 */
+}
+
+/* 选中状态的样式 */
+.priority-btn.active {
+  color: #333;
+  font-weight: 500;
+}
+
+.priority-btn.active[data-priority="0"] {
+  background: rgba(8, 151, 156, 0.2);
+}
+
+.priority-btn.active[data-priority="1"] {
+  background: rgba(29, 57, 196, 0.2);
+}
+
+.priority-btn.active[data-priority="2"] {
+  background: rgba(196, 29, 127, 0.2);
+}
+
+.priority-btn.active[data-priority="3"] {
+  background: rgba(207, 19, 34, 0.2);
+}
+
+/* 功能按钮样式优化 */
+.function-btn {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f5f5f5;
+  color: #07c160;
+  font-size: 24rpx;
+}
+
+/* 底部按钮样式优化 */
+.footer-buttons {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 16rpx;
+  z-index: 100;
+}
+
+.btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  font-weight: 500;  /* 保持中等字重 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn.cancel {
+  background: #f5f5f5;
   color: #666;
 }
 
-.link-btn:active {
-  transform: scale(0.95);
-  background: #e6e8eb;
+.btn.confirm {
+  background: #07c160;
+  color: #fff;
 }
 
-/* 调整输入框样式 */
-.link-wrapper .input {
-  flex: 1;
+/* 附件按钮样式 */
+.attach-btn {
+  width: 36rpx;
+  height: 36rpx;
+  background: #f0f2f5;
+  border-radius: 50%;
+  margin-left: 12rpx;
 }
 
-/* 时间输入框样式 */
-.time-inputs {
+.attach-btn text {
+  font-size: 24rpx;
+  color: #07c160;
+}
+
+/* 附件列表样式 */
+.attachment-list {
+  width: 100%;
+}
+
+/* 附件项样式 */
+.attachment-item {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
   width: 100%;
-  padding: 16rpx 0;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  margin-bottom: 12rpx;
+  position: relative;
+  box-sizing: border-box;
+  transition: opacity 0.2s;  /* 添加过渡效果 */
 }
 
-.time-row {
-  flex: 1;
+.attachment-item:active {
+  opacity: 0.8;  /* 点击时的反馈效果 */
+}
+
+/* 附件图标/预览图 */
+.attachment-preview {
+  width: 100%;
+  height: 360rpx;  /* 固定高度，确保预览效果 */
+  border-radius: 8rpx 8rpx 0 0;  /* 只设置上方圆角 */
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.attachment-preview image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;  /* 保持图片比例 */
+}
+
+/* 附件信息 */
+.attachment-info {
+  width: 100%;
+  padding: 16rpx;
+  background: #f8f9fa;
+  border-radius: 0 0 8rpx 8rpx;
+  display: flex;  /* 改为横向布局 */
+  align-items: center;  /* 垂直居中对齐 */
+  justify-content: space-between;  /* 两端对齐 */
+}
+
+.attachment-name {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.4;
+  flex: 1;  /* 占据剩余空间 */
+  margin-right: 16rpx;  /* 与大小信息保持间距 */
+  overflow: hidden;  /* 处理文本溢出 */
+  text-overflow: ellipsis;  /* 显示省略号 */
+  white-space: nowrap;  /* 不换行 */
+}
+
+.attachment-size {
+  font-size: 24rpx;
+  color: #999;
+  flex-shrink: 0;  /* 防止大小信息被压缩 */
+}
+
+/* 删除按钮 */
+.attachment-delete {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+  transition: all 0.2s;  /* 添加过渡效果 */
+}
+
+.attachment-delete:active {
+  background: rgba(0, 0, 0, 0.4);  /* 点击时加深背景色 */
+  transform: scale(0.9);  /* 点击时缩小 */
+}
+
+.attachment-delete text {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 300;  /* 使叉号更细一些 */
+}
+
+/* 空状态提示 */
+.empty-tip {
+  text-align: center;
+  padding: 32rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 附件网格布局优化 */
+.attachment-grid {
+  display: flex;
+  width: 100%;
+}
+
+/* 图片预览样式 */
+.image-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.image-preview image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 视频预览样式 */
+.video-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.video-preview image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-play-icon text {
+  color: #fff;
+  font-size: 24rpx;
+}
+
+/* 其他类型文件预览样式 */
+.file-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx;
+}
+
+.file-icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.file-name {
+  font-size: 28rpx;
+  font-weight: 400;  /* 普通字重 */
+  color: #333;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+/* 文件类型特殊样式 */
+.file-icon.image { background: #e6fffb; }
+.file-icon.video { background: #fff7e6; }
+.file-icon.audio { background: #f0f5ff; }
+.file-icon.doc { background: #f6ffed; }
+.file-icon.other { background: #f5f5f5; }
+
+/* 删除按钮样式 */
+.delete-btn {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.attachment-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn text {
+  color: #fff;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+/* 时间选择器样式优化 */
+.time-picker {
+  width: 100%;
+  padding: 24rpx;
   display: flex;
   align-items: center;
   gap: 16rpx;
   background: #fff;
-  padding: 20rpx;
-  border-radius: 12rpx;
-  transition: all 0.3s;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
-.time-row:hover {
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
-}
-
-.time-dot {
-  font-size: 24rpx;
-}
-
-.time-dot.start {
-  color: #13c2c2;
-}
-
-.time-dot.end {
-  color: #f5222d;
-}
-
-.time-label {
-  font-size: 30rpx;
-  color: #333;
-  white-space: nowrap;
-  min-width: 120rpx;
-}
-
-.time-input-group {
+.time-picker-item {
   flex: 1;
+  height: 88rpx;
   display: flex;
   align-items: center;
-  height: 64rpx;
-  gap: 16rpx;
-}
-
-.time-input {
-  height: 64rpx;
-  border: none;
-  background: #f8f9fa;
+  justify-content: center;
+  background: #f5f7fa;
   border-radius: 8rpx;
-  font-size: 30rpx;
+  font-size: 28rpx;
+  font-weight: 400;  /* 普通字重 */
   color: #333;
-  text-align: center;
-  padding: 0 8rpx;
-  transition: all 0.3s;
 }
 
-.time-input:focus {
-  background: #f0f2f5;
+/* 附件预览区域 */
+.attachments-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  padding: 24rpx;
 }
 
-.time-input.year {
-  width: 100rpx;
+/* 输入框占位符文案修改 */
+.input[data-field="url"]::placeholder {
+  content: none;
 }
 
-.time-input.month,
-.time-input.day,
-.time-input.hour,
-.time-input.minute {
-  width: 64rpx;
+/* 备注输入框样式 */
+textarea[data-field="notes"] {
+  font-weight: 400;
+  line-height: 1.5;
 }
 
-.time-input::placeholder {
-  color: #999;
+/* 备注输入框占位符样式 */
+textarea[data-field="notes"]::placeholder {
   font-size: 28rpx;
-}
-
-/* 分隔符样式优化 */
-.separator {
-  color: #999;
-  font-size: 28rpx;
-  opacity: 0.8;
-  padding: 0 4rpx;
+  font-weight: 300;  /* 确保使用细字重 */
+  opacity: 0.7;  /* 保持一致的透明度 */
 } 

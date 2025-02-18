@@ -14,7 +14,8 @@
   "author": "your-name",
   "license": "MIT",
   "dependencies": {
-    "dayjs": "^1.11.7"
+    "dayjs": "^1.11.7",
+    "marked": "^15.0.7"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^3.9.1"
