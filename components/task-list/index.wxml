@@ -1,6 +1,6 @@
 <view class="task-list">
   <block wx:if="{{tasks.length > 0}}">
-    <view class="task-item" 
+    <view class="task-item {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
           wx:for="{{tasks}}" 
           wx:key="id"
           bindtap="onTaskClick"

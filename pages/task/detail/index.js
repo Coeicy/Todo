@@ -1,5 +1,5 @@
 const app = getApp()
-const db = app.globalData.db
+const db = require('../../../utils/db')
 const notification = require('../../../utils/notification')
 
 Page({
@@ -14,32 +14,46 @@ Page({
       location: '',
       url: '',
       important: false
-    }
+    },
+    loading: true
   },
 
   onLoad(options) {
-    const { id } = options
-    if (id) {
-      this.loadTask(id)
+    if (options.id) {
+      this.loadTask(options.id)
+    } else {
+      wx.showToast({
+        title: '参数错误',
+        icon: 'error'
+      })
+      setTimeout(() => wx.navigateBack(), 1500)
     }
   },
 
   // 加载任务数据
   loadTask(id) {
-    const task = db.getTask(id)
-    if (task) {
-      this.setData({ 
-        task,
-        editForm: { ...task }
-      })
-    } else {
+    try {
+      const task = db.getTask(id)
+      if (task) {
+        this.setData({
+          task,
+          editForm: { ...task },
+          loading: false
+        })
+      } else {
+        wx.showToast({
+          title: '任务不存在',
+          icon: 'error'
+        })
+        setTimeout(() => wx.navigateBack(), 1500)
+      }
+    } catch (error) {
+      console.error('加载任务失败:', error)
       wx.showToast({
-        title: '任务不存在',
+        title: '加载失败',
         icon: 'error'
       })
-      setTimeout(() => {
-        wx.navigateBack()
-      }, 1500)
+      setTimeout(() => wx.navigateBack(), 1500)
     }
   },
 
@@ -54,62 +68,71 @@ Page({
   },
 
   // 更新任务
-  updateTask() {
-    const { task, editForm } = this.data
-    
-    // 验证表单
-    if (!editForm.title.trim()) {
+  updateTask(data) {
+    const { task } = this.data
+    try {
+      const updatedTask = db.updateTask(task.id, data)
+      if (updatedTask) {
+        this.setData({
+          task: updatedTask,
+          showEditModal: false
+        })
+        wx.showToast({
+          title: '更新成功',
+          icon: 'success'
+        })
+      }
+    } catch (error) {
+      console.error('更新任务失败:', error)
       wx.showToast({
-        title: '请输入任务标题',
-        icon: 'none'
-      })
-      return
-    }
-
-    // 更新任务
-    const updatedTask = db.updateTask(task.id, editForm)
-    if (updatedTask) {
-      this.setData({
-        task: updatedTask,
-        showEditModal: false
-      })
-      wx.showToast({
-        title: '更新成功'
+        title: '更新失败',
+        icon: 'error'
       })
     }
   },
 
   // 删除任务
   deleteTask() {
+    const { task } = this.data
     wx.showModal({
       title: '确认删除',
       content: '确定要删除这个任务吗？',
       success: (res) => {
         if (res.confirm) {
-          const { task } = this.data
-          if (db.deleteTask(task.id)) {
+          try {
+            db.deleteTask(task.id)
             wx.showToast({
-              title: '删除成功'
+              title: '删除成功',
+              icon: 'success'
             })
-            setTimeout(() => {
-              wx.navigateBack()
-            }, 1500)
+            setTimeout(() => wx.navigateBack(), 1500)
+          } catch (error) {
+            console.error('删除任务失败:', error)
+            wx.showToast({
+              title: '删除失败',
+              icon: 'error'
+            })
           }
         }
       }
     })
   },
 
-  // 切换任务状态
-  toggleStatus() {
+  // 切换任务完成状态
+  toggleComplete() {
     const { task } = this.data
-    const updatedTask = db.updateTask(task.id, {
+    this.updateTask({
       completed: !task.completed,
-      completedTime: new Date().toISOString()
+      completedTime: !task.completed ? new Date().toISOString() : null
     })
-    if (updatedTask) {
-      this.setData({ task: updatedTask })
-    }
+  },
+
+  // 切换重要标记
+  toggleImportant() {
+    const { task } = this.data
+    this.updateTask({
+      important: !task.important
+    })
   },
 
   // 表单输入处理
@@ -117,13 +140,6 @@ Page({
     const { field } = e.currentTarget.dataset
     this.setData({
       [`editForm.${field}`]: e.detail.value
-    })
-  },
-
-  // 切换重要标记
-  toggleImportant() {
-    this.setData({
-      'editForm.important': !this.data.editForm.important
     })
   }
 }) 

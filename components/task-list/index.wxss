@@ -7,6 +7,8 @@
   align-items: center;
   padding: 20rpx 0;
   border-bottom: 1px solid #f0f0f0;
+  opacity: 1;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .task-status {
@@ -18,12 +20,25 @@
   align-items: center;
   justify-content: center;
   margin-right: 20rpx;
+  transition: all 0.3s ease;
 }
 
 .task-status.completed {
   background: #52c41a;
   border-color: #52c41a;
+  transition: all 1s ease;
+}
+
+.task-status .icon {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.task-status.completed .icon {
+  opacity: 1;
   color: #fff;
+  animation: checkmark 0.3s ease-in-out forwards;
 }
 
 .task-content {
@@ -91,4 +106,18 @@
 .time-text {
   font-size: 24rpx;
   color: #666;
-} 
+}
+
+/* 任务完成时的动画效果 - 只有淡出 */
+.task-item.completing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 已完成任务的样式 - 直接显示，无动画 */
+.completed-tasks .task-item {
+  opacity: 0.8;
+  animation: none;
+}
+
+/* 移除其他动画相关代码... */ 

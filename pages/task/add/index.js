@@ -95,86 +95,89 @@ Page({
       // 1. 整理表单数据
       const taskData = this.formatTaskData();
       
-      // 2. 获取现有任务列表
-      let tasks = wx.getStorageSync('tasks') || [];
-      
-      // 3. 生成新任务ID
-      const taskId = Date.now().toString();
-      taskData.id = taskId;
-      
-      // 4. 添加新任务到列表开头
-      tasks.unshift(taskData);
-      
-      // 5. 保存更新后的任务列表
-      wx.setStorageSync('tasks', tasks);
-
-      // 6. 如果有附件，保存附件信息
-      if (this.data.attachments.length > 0) {
-        this.saveAttachments(taskId);
-      }
-
-      wx.showToast({
-        title: '保存成功',
-        icon: 'success'
+      // 2. 添加任务到数据库
+      const newTask = db.addTask({
+        ...taskData,
+        completed: false,
+        priority: parseInt(this.data.form.priority || 0),
+        createTime: new Date().toISOString(),
+        updateTime: new Date().toISOString()
       });
 
-      return taskId;
+      if (newTask) {
+        // 3. 显示成功提示
+        wx.showToast({
+          title: '添加成功',
+          icon: 'success'
+        });
+
+        // 4. 获取首页实例并刷新
+        const pages = getCurrentPages();
+        const indexPage = pages.find(p => p.route === 'pages/index/index');
+        if (indexPage) {
+          // 确保回到未完成视图
+          indexPage.setData({
+            filter: 'undone'
+          }, () => {
+            indexPage.loadTasks();
+          });
+        }
+
+        // 5. 延迟返回上一页
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
+
+        return newTask.id;
+      }
     } catch (err) {
       console.error('保存任务失败:', err);
+      wx.showToast({
+        title: '保存失败',
+        icon: 'error'
+      });
       throw err;
     }
   },
 
   // 格式化任务数据
   formatTaskData() {
-    const { form, attachments } = this.data;
+    const { form } = this.data;
     
     // 构建开始时间
-    const startTime = this.formatDateTime(
-      form.startYear,
-      form.startMonth,
-      form.startDay,
-      form.startHour,
-      form.startMinute
-    );
+    let startTime = null;
+    if (form.startYear && form.startMonth && form.startDay) {
+      startTime = new Date(
+        parseInt(form.startYear),
+        parseInt(form.startMonth) - 1,
+        parseInt(form.startDay),
+        parseInt(form.startHour) || 0,
+        parseInt(form.startMinute) || 0
+      ).toISOString();
+    }
 
-    // 构建结束时间
-    const endTime = this.formatDateTime(
-      form.endYear,
-      form.endMonth,
-      form.endDay,
-      form.endHour,
-      form.endMinute
-    );
+    // 构建截止时间
+    let dueDate = null;
+    if (form.endYear && form.endMonth && form.endDay) {
+      dueDate = new Date(
+        parseInt(form.endYear),
+        parseInt(form.endMonth) - 1,
+        parseInt(form.endDay),
+        parseInt(form.endHour) || 23,
+        parseInt(form.endMinute) || 59
+      ).toISOString();
+    }
 
     return {
       title: form.title.trim(),
-      priority: form.priority,
-      startTime,
-      endTime,
-      location: form.location.trim(),
       notes: form.notes.trim(),
+      startTime,
+      dueDate,
+      location: form.location.trim(),
       url: form.url.trim(),
-      attachments: this.data.attachments,
-      status: 'pending',
-      createTime: Date.now(),
-      updateTime: Date.now()
+      attachments: this.data.attachments || [],
+      important: form.important || false
     };
-  },
-
-  // 格式化日期时间
-  formatDateTime(year, month, day, hour, minute) {
-    if (!year || !month || !day) return null;
-    
-    const date = new Date(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hour) || 0,
-      parseInt(minute) || 0
-    );
-    
-    return date.getTime();
   },
 
   // 保存附件信息

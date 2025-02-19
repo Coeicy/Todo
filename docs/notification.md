@@ -1,5 +1,143 @@
 # 通知系统设计文档
 
+## 系统架构
+
+### 1. 核心组件
+- 提醒管理器 (ReminderManager)
+- 通知发送器 (NotificationSender)
+- 通知存储器 (NotificationStorage)
+- 定时任务管理器 (TimerManager)
+
+### 2. 数据流
+```
+任务创建/更新 -> 提醒设置 -> 定时检查 -> 发送通知 -> 更新状态
+```
+
+## 功能实现
+
+### 1. 提醒设置
+```javascript
+// 设置提醒
+async function setReminder(taskId, reminderTime) {
+  // 1. 验证任务
+  const task = await db.getTask(taskId)
+  if (!task) throw new Error('任务不存在')
+  
+  // 2. 创建提醒
+  const reminder = {
+    id: generateId(),
+    taskId,
+    time: reminderTime,
+    status: 'pending'
+  }
+  
+  // 3. 保存提醒
+  await saveReminder(reminder)
+  
+  // 4. 设置定时器
+  scheduleReminder(reminder)
+}
+```
+
+### 2. 通知发送
+```javascript
+// 发送通知
+async function sendNotification(reminder) {
+  // 1. 获取任务信息
+  const task = await db.getTask(reminder.taskId)
+  
+  // 2. 构建通知内容
+  const notification = {
+    title: '任务提醒',
+    content: `任务"${task.title}"即将到期`,
+    time: new Date().toISOString()
+  }
+  
+  // 3. 发送通知
+  await wx.requestSubscribeMessage({
+    tmplIds: [TEMPLATE_ID]
+  })
+  
+  // 4. 更新状态
+  await updateReminderStatus(reminder.id, 'sent')
+}
+```
+
+## 通知模板
+
+### 1. 任务提醒模板
+```javascript
+{
+  template_id: "template_xxx",
+  title: "任务提醒",
+  content: "任务名称：{{taskName}}",
+  time: "时间：{{time}}",
+  status: "状态：{{status}}"
+}
+```
+
+### 2. 每日摘要模板
+```javascript
+{
+  template_id: "template_yyy",
+  title: "每日任务摘要",
+  date: "日期：{{date}}",
+  total: "总任务数：{{total}}",
+  completed: "已完成：{{completed}}"
+}
+```
+
+## 错误处理
+
+### 1. 发送失败处理
+```javascript
+try {
+  await sendNotification(reminder)
+} catch (error) {
+  // 1. 记录错误
+  logError('发送通知失败', error)
+  
+  // 2. 更新状态
+  await updateReminderStatus(reminder.id, 'failed')
+  
+  // 3. 安排重试
+  scheduleRetry(reminder)
+}
+```
+
+### 2. 权限处理
+```javascript
+async function checkNotificationPermission() {
+  try {
+    const setting = await wx.getSetting()
+    if (!setting.authSetting['scope.notification']) {
+      await wx.requestSubscribeMessage({
+        tmplIds: [TEMPLATE_ID]
+      })
+    }
+  } catch (error) {
+    console.error('获取通知权限失败:', error)
+  }
+}
+```
+
+## 性能优化
+
+### 1. 批量处理
+- 合并相近时间的提醒
+- 批量发送通知
+- 定期清理过期数据
+
+### 2. 错误重试
+- 指数退避算法
+- 最大重试次数限制
+- 失败通知处理
+
+### 3. 资源管理
+- 限制并发请求数
+- 合理设置缓存
+- 优化数据结构
+
 ## 系统概述
 
 通知系统提供任务提醒和消息通知功能，基于本地存储实现，支持自定义提醒时间、多种提醒方式和通知管理。
@@ -101,23 +239,6 @@ await notification.batchMarkAsRead([id1, id2, id3])
 // 获取统计信息
 const stats = notification.getNotificationStats()
 ```
-
-## 性能优化
-
-1. 存储优化
-- 定期清理过期数据
-- 控制存储数据量
-- 优化查询性能
-
-2. 内存管理
-- 避免内存泄漏
-- 及时释放资源
-- 控制缓存大小
-
-3. 错误处理
-- 完善的错误捕获
-- 友好的错误提示
-- 错误日志记录
 
 ## 最佳实践
 

@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/notification/logs/index",
     "pages/notification/detail/index",
     "pages/calendar/calendar",
     "pages/task/detail/index",
@@ -27,12 +26,6 @@
         "text": "任务",
         "iconPath": "assets/icons/task.png",
         "selectedIconPath": "assets/icons/task-active.png"
-      },
-      {
-        "pagePath": "pages/notification/logs/index",
-        "text": "通知",
-        "iconPath": "assets/icons/notification.png",
-        "selectedIconPath": "assets/icons/notification-active.png"
       },
       {
         "pagePath": "pages/calendar/calendar",

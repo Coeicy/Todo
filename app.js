@@ -4,13 +4,17 @@ App({
   globalData: {
     userInfo: null,
     theme: 'light',
-    db: null
+    db: db
   },
 
   onLaunch() {
     // 初始化数据库
-    this.globalData.db = db
-    db.init()
+    try {
+      db.init()
+      this.globalData.db = db
+    } catch (error) {
+      console.error('数据库初始化失败:', error)
+    }
     
     // 获取系统信息
     const systemInfo = wx.getSystemInfoSync()

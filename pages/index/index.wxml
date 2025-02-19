@@ -21,30 +21,56 @@
   <!-- 任务列表 -->
   <view class="task-list" wx:if="{{filter !== 'quadrant'}}">
     <block wx:if="{{filteredTasks.length > 0}}">
+      <!-- 已完成任务列表 -->
+      <view class="completed-tasks" wx:if="{{filter === 'done'}}">
+        <view class="task-card {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
+              wx:for="{{filteredTasks}}" 
+              wx:key="id"
+              wx:for-item="task"
+              data-task="{{task}}"
+              catch:tap="goToDetail">
+          <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                catchtap="toggleTaskStatus"
+                data-task-id="{{task.id}}">
+            <text class="check-mark">✓</text>
+          </view>
+          <view class="task-content">
+            <text class="task-title completed">{{task.title}}</text>
+            <text class="completion-time">{{formatCompletionTime(task.completedAt)}}</text>
+          </view>
+        </view>
+      </view>
+
       <!-- 任务分组 -->
       <block wx:for="{{taskGroups}}" wx:key="title">
-        <view class="task-group" 
-              wx:if="{{item.tasks.length > 0}}"
-              data-group="{{item.title}}"
-              bind:touchmove="onGroupDragOver"
-              bind:touchend="onGroupDrop">
+        <view class="task-group">
           <view class="group-title">{{item.title}}</view>
-          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}}"
-                wx:for="{{item.tasks}}" 
-                wx:key="id"
-                wx:for-item="task"
-                data-task="{{task}}"
-                bind:longpress="onTaskDragStart"
-                bind:touchend="onTaskDragEnd"
-                catch:tap="goToDetail"
-                data-id="{{task.id}}">
-            <text class="task-title">{{task.title}}</text>
-            <block wx:if="{{task.dueDate}}">
-              <view class="task-time">
-                <text class="due-date">截止：{{task.dueDate}}</text>
-                <text class="countdown {{task.isOverdue ? 'overdue' : ''}}">{{task.countdown}}</text>
+          <view class="group-tasks">
+            <view class="task-item" 
+                  wx:for="{{item.tasks}}" 
+                  wx:key="id" 
+                  wx:for-item="task"
+                  bindtap="goToDetail"
+                  data-task="{{task}}">
+              <view class="task-card {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
+                    catch:tap="goToDetail"
+                    data-task="{{task}}">
+                <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                      catchtap="toggleTaskStatus" 
+                      data-task-id="{{task.id}}">
+                  <text class="checkbox-inner" wx:if="{{task.completed}}">✓</text>
+                </view>
+                
+                <!-- 任务内容 -->
+                <view class="task-content">
+                  <text class="task-title {{task.completed ? 'completed' : ''}}">{{task.title}}</text>
+                  <view class="task-footer" wx:if="{{task.dueDate}}">
+                    <text class="due-date">截止: {{task.dueDate}}</text>
+                    <text class="countdown">{{task.countdown || '已过期'}}</text>
+                  </view>
+                </view>
               </view>
-            </block>
+            </view>
           </view>
         </view>
       </block>
@@ -68,7 +94,7 @@
           <text>重要且紧急</text>
         </view>
         <view class="task-list">
-          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}}"
+          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}} {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
                 wx:for="{{quadrantTasks[3]}}" 
                 wx:key="id"
                 wx:for-item="task"
@@ -76,7 +102,12 @@
                 bind:longpress="onTaskDragStart"
                 bind:touchend="onTaskDragEnd"
                 catch:tap="goToDetail">
-            <text class="task-title">{{task.title}}</text>
+            <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                  catchtap="toggleTaskStatus"
+                  data-task-id="{{task.id}}">
+              <text class="check-mark" wx:if="{{task.completed}}">✓</text>
+            </view>
+            <text class="task-title {{task.completed ? 'completed' : ''}}">{{task.title}}</text>
             <block wx:if="{{task.dueDate}}">
               <view class="task-time">
                 <text class="countdown">{{task.countdown}}</text>
@@ -96,7 +127,7 @@
           <text>重要不紧急</text>
         </view>
         <view class="task-list">
-          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}}"
+          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}} {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
                 wx:for="{{quadrantTasks[2]}}" 
                 wx:key="id"
                 wx:for-item="task"
@@ -104,7 +135,12 @@
                 bind:longpress="onTaskDragStart"
                 bind:touchend="onTaskDragEnd"
                 catch:tap="goToDetail">
-            <text class="task-title">{{task.title}}</text>
+            <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                  catchtap="toggleTaskStatus"
+                  data-task-id="{{task.id}}">
+              <text class="check-mark" wx:if="{{task.completed}}">✓</text>
+            </view>
+            <text class="task-title {{task.completed ? 'completed' : ''}}">{{task.title}}</text>
             <block wx:if="{{task.dueDate}}">
               <view class="task-time">
                 <text class="countdown">{{task.countdown}}</text>
@@ -124,7 +160,7 @@
           <text>不重要但紧急</text>
         </view>
         <view class="task-list">
-          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}}"
+          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}} {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
                 wx:for="{{quadrantTasks[1]}}" 
                 wx:key="id"
                 wx:for-item="task"
@@ -132,7 +168,12 @@
                 bind:longpress="onTaskDragStart"
                 bind:touchend="onTaskDragEnd"
                 catch:tap="goToDetail">
-            <text class="task-title">{{task.title}}</text>
+            <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                  catchtap="toggleTaskStatus"
+                  data-task-id="{{task.id}}">
+              <text class="check-mark" wx:if="{{task.completed}}">✓</text>
+            </view>
+            <text class="task-title {{task.completed ? 'completed' : ''}}">{{task.title}}</text>
             <block wx:if="{{task.dueDate}}">
               <view class="task-time">
                 <text class="countdown">{{task.countdown}}</text>
@@ -152,7 +193,7 @@
           <text>不重要不紧急</text>
         </view>
         <view class="task-list">
-          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}}"
+          <view class="task-card {{dragTask.id === task.id ? 'dragging' : ''}} {{task.completed ? 'completed' : ''}} {{task.completing ? 'completing' : ''}}"
                 wx:for="{{quadrantTasks[0]}}" 
                 wx:key="id"
                 wx:for-item="task"
@@ -160,7 +201,12 @@
                 bind:longpress="onTaskDragStart"
                 bind:touchend="onTaskDragEnd"
                 catch:tap="goToDetail">
-            <text class="task-title">{{task.title}}</text>
+            <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
+                  catchtap="toggleTaskStatus"
+                  data-task-id="{{task.id}}">
+              <text class="check-mark" wx:if="{{task.completed}}">✓</text>
+            </view>
+            <text class="task-title {{task.completed ? 'completed' : ''}}">{{task.title}}</text>
             <block wx:if="{{task.dueDate}}">
               <view class="task-time">
                 <text class="countdown">{{task.countdown}}</text>

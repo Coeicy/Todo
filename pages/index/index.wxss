@@ -21,6 +21,9 @@
   border-radius: 12rpx;
   margin-bottom: 16rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+  transform-origin: left center;
 }
 
 /* 任务内容 */
@@ -30,10 +33,11 @@
 }
 
 .task-title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #333;
   font-weight: 500;
   margin-bottom: 8rpx;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .task-info {
@@ -553,7 +557,6 @@
   text-align: center;
   font-size: 26rpx;
   padding: 0;
-  border: 1rpx solid var(--border-color);
 }
 
 .time-unit.year {
@@ -641,12 +644,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4rpx 16rpx rgba(7, 193, 96, 0.3);
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .floating-btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 2rpx 8rpx rgba(7, 193, 96, 0.2);
+  transform: scale(0.92);
+  opacity: 0.9;
 }
 
 .floating-btn text {
@@ -677,7 +680,7 @@
   font-size: 28rpx;
   color: #999;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0 6rpx;
   border-radius: 12rpx;
 }
@@ -686,6 +689,7 @@
   color: #07c160;
   font-weight: 500;
   background: #e7f6ed;
+  transform: scale(1.02);
 }
 
 /* 添加动画效果 */
@@ -715,33 +719,98 @@
 
 /* 任务卡片样式 */
 .task-card {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  gap: 12rpx;
   background: #fff;
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-  position: relative;
+  border-radius: 8rpx;
+  margin-bottom: 8rpx;
+  opacity: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.02);
 }
 
+/* 任务完成时的动画效果 */
+.task-card.completing {
+  opacity: 0;
+  transform: translateY(10rpx);
+  pointer-events: none;
+}
+
+/* 已完成任务的样式 */
+.task-card.completed {
+  opacity: 0.85;
+  background: #f8f8f8;
+}
+
+/* 任务标题样式 */
 .task-title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #333;
-  font-weight: 500;
-  margin-bottom: 16rpx;
-  display: block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.task-time {
+.task-title.completed {
+  color: #999;
+  text-decoration: line-through;
+  text-decoration-color: rgba(0, 0, 0, 0.2);
+}
+
+/* 点击波纹效果 */
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+.checkbox::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkbox:active::after {
+  animation: ripple 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 26rpx;
-  color: #999;
+  font-size: 24rpx;
+  color: #666;
+  margin-top: auto;
+}
+
+.due-date {
+  color: #666;
 }
 
 .countdown {
   color: #f5222d;
   font-weight: 500;
+}
+
+/* 过期任务样式 */
+.task-card.overdue {
+  background: #fff1f0;
+}
+
+.task-card.overdue .countdown {
+  color: #cf1322;
 }
 
 /* 任务分组样式 */
@@ -754,11 +823,6 @@
   color: #666;
   margin-bottom: 16rpx;
   padding-left: 8rpx;
-}
-
-/* 过期任务样式 */
-.countdown.overdue {
-  color: #ff4d4f;
 }
 
 /* 象限视图样式 */
@@ -834,4 +898,102 @@
 .task-group {
   transition: background-color 0.3s;
   padding: 8rpx;
+}
+
+.task-item:active {
+  background-color: #f5f5f5;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 象限任务卡片中的复选框样式 */
+.task-card {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  gap: 12rpx;
+}
+
+/* 复选框基础样式 */
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2.5rpx solid #999;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 优先级边框颜色 */
+.checkbox.priority-0 { border-color: #999; }      /* 普通任务 */
+.checkbox.priority-1 { border-color: #1890ff; }   /* 低优先级 */
+.checkbox.priority-2 { border-color: #faad14; }   /* 中优先级 */
+.checkbox.priority-3 { border-color: #ff4d4f; }   /* 高优先级 */
+
+/* 选中状态 */
+.checkbox.completed {
+  border-color: transparent;
+  background: #52c41a;
+}
+
+/* 勾选图标动画 */
+.check-mark {
+  color: #fff;
+  font-size: 24rpx;
+  opacity: 0;
+  transform: scale(0.5) translateY(4rpx);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkbox.completed .check-mark {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* 已完成任务列表样式 */
+.completed-tasks {
+  padding: 24rpx 0;
+}
+
+.completed-tasks .task-card {
+  margin-bottom: 16rpx;
+  opacity: 0.8;
+}
+
+.completion-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+/* 已完成任务的内容区域 */
+.task-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+/* 复选框动画 */
+.checkbox {
+  transition: all 0.3s ease;
+}
+
+.checkbox.completed {
+  transform: scale(1.05);
+  border-color: transparent;
 } 

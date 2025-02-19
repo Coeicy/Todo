@@ -1,34 +1,59 @@
 # 组件文档
 
-## 任务列表组件 (task-list)
+## 1. 任务列表组件
 
-用于显示任务列表。
+### 功能描述
+显示任务列表，支持多种视图模式和交互操作。
 
 ### 使用方法
 ```html
 <task-list 
   tasks="{{tasks}}"
-  showEmpty="{{true}}"
-  emptyText="暂无任务"
-  bindstatusChange="onStatusChange"
-  bindimportantChange="onImportantChange"
-  bindtaskClick="onTaskClick"
+  filter="{{filter}}"
+  bind:statusChange="onStatusChange"
+  bind:taskClick="onTaskClick"
 />
 ```
 
 ### 属性说明
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| tasks | Array | [] | 任务列表数据 |
+| tasks | Array | [] | 任务数据列表 |
+| filter | String | 'all' | 过滤类型 |
 | showEmpty | Boolean | true | 是否显示空状态 |
-| emptyText | String | '暂无任务' | 空状态文本 |
 
 ### 事件
 | 事件名 | 说明 | 参数 |
 |--------|------|------|
-| statusChange | 任务状态变更 | {task, completed} |
-| importantChange | 重要标记变更 | {task, important} |
-| taskClick | 点击任务项 | {task} |
+| statusChange | 任务状态变更 | {taskId, completed} |
+| taskClick | 点击任务项 | {taskId, task} |
+
+## 2. 日历组件
+
+### 功能描述
+显示日历视图，支持农历、节假日、任务标记等功能。
+
+### 使用方法
+```html
+<calendar 
+  showLunar="{{true}}"
+  tasks="{{tasks}}"
+  bind:dateSelect="onDateSelect"
+/>
+```
+
+### 属性说明
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| showLunar | Boolean | true | 显示农历 |
+| tasks | Array | [] | 任务数据 |
+| selectedDate | String | '' | 选中日期 |
+
+### 事件
+| 事件名 | 说明 | 参数 |
+|--------|------|------|
+| dateSelect | 选择日期 | {date} |
+| monthChange | 切换月份 | {year, month} |
 
 ## 任务筛选组件 (task-filter)
 
@@ -51,36 +76,6 @@
 | 事件名 | 说明 | 参数 |
 |--------|------|------|
 | change | 筛选条件变更 | {filter} |
-
-## 日历组件 (calendar)
-
-用于显示日历和任务。
-
-### 使用方法
-```html
-<calendar 
-  show-lunar="{{true}}"
-  show-festival="{{true}}"
-  show-task-dots="{{true}}"
-  tasks="{{tasks}}"
-  bind:select="onDateSelect"
-  bind:monthChange="onMonthChange"
-/>
-```
-
-### 属性说明
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| show-lunar | Boolean | true | 显示农历 |
-| show-festival | Boolean | true | 显示节日 |
-| show-task-dots | Boolean | true | 显示任务标记 |
-| tasks | Array | [] | 任务数据 |
-
-### 事件
-| 事件名 | 说明 | 参数 |
-|--------|------|------|
-| select | 选择日期 | {date} |
-| monthChange | 月份变更 | {year, month} |
 
 ## 任务表单组件 (task-form)
 

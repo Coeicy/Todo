@@ -7,9 +7,7 @@ class DB {
 
   init() {
     try {
-      // 从本地存储加载任务
-      const tasks = wx.getStorageSync('tasks') || []
-      this.tasks = tasks
+      this.tasks = wx.getStorageSync('tasks') || []
       this.initialized = true
     } catch (error) {
       console.error('初始化数据库失败:', error)
@@ -24,71 +22,111 @@ class DB {
     return this.tasks
   }
 
-  addTask(taskData) {
-    if (!this.initialized) {
-      this.init()
+  addTask(task) {
+    try {
+      const newTask = {
+        ...task,
+        id: Date.now().toString(),
+        completed: false,
+        createdAt: new Date().toISOString(),
+        completedAt: null
+      }
+      
+      const tasks = this.getTasks()
+      tasks.push(newTask)
+      wx.setStorageSync('tasks', tasks)
+      return newTask
+    } catch (error) {
+      console.error('添加任务失败:', error)
+      throw error
     }
-    
-    const newTask = {
-      id: Date.now().toString(),
-      title: taskData.title || '',
-      notes: taskData.notes || '',
-      priority: taskData.priority || 0,
-      startTime: taskData.startTime || null,
-      dueDate: taskData.dueDate || null,
-      location: taskData.location || '',
-      url: taskData.url || '',
-      completed: false,
-      important: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    
-    this.tasks.unshift(newTask)
-    this.saveTasks()
-    return newTask
   }
 
-  updateTask(id, updates) {
-    if (!this.initialized) {
-      this.init()
-    }
-    
-    const index = this.tasks.findIndex(t => t.id === id)
-    if (index > -1) {
-      this.tasks[index] = {
+  updateTask(taskId, updates) {
+    try {
+      const index = this.tasks.findIndex(t => t.id === taskId);
+      if (index === -1) throw new Error('任务不存在');
+
+      const updatedTask = {
         ...this.tasks[index],
         ...updates,
-        updatedAt: new Date().toISOString()
-      }
-      this.saveTasks()
-      return this.tasks[index]
+        updateTime: new Date().toISOString()
+      };
+
+      this.tasks[index] = updatedTask;
+      this.saveTasks();
+      return updatedTask;
+    } catch (error) {
+      console.error('更新任务失败:', error);
+      throw error;
     }
-    return null
   }
 
-  deleteTask(id) {
-    if (!this.initialized) {
-      this.init()
+  deleteTask(taskId) {
+    try {
+      this.tasks = this.tasks.filter(t => t.id !== taskId);
+      this.saveTasks();
+      return true;
+    } catch (error) {
+      console.error('删除任务失败:', error);
+      throw error;
     }
-    
-    this.tasks = this.tasks.filter(t => t.id !== id)
-    this.saveTasks()
   }
 
-  getTask(id) {
-    if (!this.initialized) {
-      this.init()
-    }
-    return this.tasks.find(t => t.id === id)
+  getTask(taskId) {
+    return this.tasks.find(t => t.id === taskId);
   }
 
   saveTasks() {
     try {
-      wx.setStorageSync('tasks', this.tasks)
+      wx.setStorageSync('tasks', this.tasks);
     } catch (error) {
-      console.error('保存任务失败:', error)
-      throw error // 抛出错误以便上层处理
+      console.error('保存任务失败:', error);
+      throw error;
+    }
+  }
+
+  toggleTaskStatus(taskId) {
+    try {
+      const tasks = this.getTasks()
+      const updatedTasks = tasks.map(task => {
+        if (task.id === taskId) {
+          const completed = !task.completed
+          return {
+            ...task,
+            completed,
+            completedAt: completed ? new Date().toISOString() : null
+          }
+        }
+        return task
+      })
+      
+      wx.setStorageSync('tasks', updatedTasks)
+      return updatedTasks.find(t => t.id === taskId)
+    } catch (error) {
+      console.error('切换任务状态失败:', error)
+      throw error
+    }
+  }
+
+  updateTaskPriority(taskId, priority) {
+    try {
+      return this.updateTask(taskId, { priority });
+    } catch (error) {
+      console.error('更新任务优先级失败:', error);
+      throw error;
+    }
+  }
+
+  getCompletedTasks() {
+    try {
+      const tasks = this.getTasks()
+      return tasks
+        .filter(task => task.completed)
+        .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+    } catch (error) {
+      console.error('获取已完成任务失败:', error)
+      throw error
     }
   }
 }

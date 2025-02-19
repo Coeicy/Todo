@@ -1,5 +1,5 @@
 const app = getApp()
-let db = null
+const db = require('../../utils/db')
 const notification = require('../../utils/notification')
 
 Page({
@@ -37,27 +37,29 @@ Page({
   },
 
   onLoad() {
-    this.initDB()
     this.loadTasks()
   },
 
   onShow() {
-    this.initDB()
+    // 每次页面显示时重新加载任务
     this.loadTasks()
-    this.checkUnreadNotifications()
   },
 
   // 初始化数据库
   initDB() {
-    if (!db) {
-      db = app.globalData.db
-      if (!db) {
-        console.error('数据库未初始化')
-        wx.showToast({
-          title: '初始化失败，请重试',
-          icon: 'none'
-        })
+    try {
+      if (!db.initialized) {
+        db.init()
       }
+      if (!db.initialized) {
+        throw new Error('数据库初始化失败')
+      }
+    } catch (error) {
+      console.error('数据库未初始化', error)
+      wx.showToast({
+        title: '初始化失败',
+        icon: 'error'
+      })
     }
   },
 
@@ -70,91 +72,140 @@ Page({
 
   // 加载任务列表
   loadTasks() {
-    if (!db) {
-      this.initDB()
-      if (!db) return
-    }
-
     try {
       const tasks = db.getTasks()
-      this.setData({ 
-        tasks,
-        totalTasks: tasks.length,
-        completedTasks: tasks.filter(t => t.completed).length
-      })
+      const formattedTasks = tasks.map(task => ({
+        ...task,
+        completionTime: this.formatCompletionTime(task.completedAt)
+      }))
       
-      // 根据当前筛选类型更新视图
-      this.filterTasks()
+      this.setData({ tasks: formattedTasks })
     } catch (error) {
       console.error('加载任务失败:', error)
       wx.showToast({
-        title: '加载失败，请重试',
-        icon: 'none'
+        title: '加载失败',
+        icon: 'error'
       })
     }
   },
 
-  // 任务分组
-  groupTasks(tasks) {
-    const groups = []
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    
-    const nextWeek = new Date(today)
-    nextWeek.setDate(nextWeek.getDate() + 7)
+  // 处理象限视图的任务
+  processQuadrantTasks(tasks) {
+    const quadrantTasks = {
+      0: [], // 不重要不紧急
+      1: [], // 不重要但紧急
+      2: [], // 重要不紧急
+      3: []  // 重要且紧急
+    }
+
+    tasks.forEach(task => {
+      if (!task.completed) {
+        quadrantTasks[task.priority].push(task)
+      }
+    })
+
+    this.setData({ quadrantTasks })
+  },
+
+  // 处理过滤后的任务
+  processFilteredTasks(tasks) {
+    let filteredTasks = []
+    const filter = this.data.filter
+
+    if (filter === 'done') {
+      filteredTasks = tasks.filter(task => task.completed)
+    } else if (filter === 'undone') {
+      filteredTasks = tasks.filter(task => !task.completed)
+      const taskGroups = this.groupTasksByDueDate(filteredTasks)
+      this.setData({ taskGroups })
+    }
+
+    this.setData({ filteredTasks })
+  },
+
+  // 按截止时间对任务进行分组
+  groupTasksByDueDate(tasks) {
+    const groups = [];
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    // 已过期的任务
+    const overdueTasks = tasks.filter(task => {
+      if (!task.dueDate) return false;
+      return new Date(task.dueDate) < today;
+    });
+    if (overdueTasks.length > 0) {
+      groups.push({
+        title: '已过期',
+        tasks: overdueTasks
+      });
+    }
 
     // 今天的任务
     const todayTasks = tasks.filter(task => {
-      if (!task.dueDate) return false
-      const dueDate = new Date(task.dueDate)
-      return dueDate >= today && dueDate < tomorrow
-    })
+      if (!task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= today && dueDate < tomorrow;
+    });
     if (todayTasks.length > 0) {
       groups.push({
         title: '今天',
         tasks: todayTasks
-      })
+      });
     }
 
     // 明天的任务
     const tomorrowTasks = tasks.filter(task => {
-      if (!task.dueDate) return false
-      const dueDate = new Date(task.dueDate)
-      return dueDate >= tomorrow && dueDate < nextWeek
-    })
+      if (!task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= tomorrow && dueDate < nextWeek;
+    });
     if (tomorrowTasks.length > 0) {
       groups.push({
         title: '明天',
         tasks: tomorrowTasks
-      })
+      });
     }
 
-    // 以后的任务
+    // 最近7天的任务
+    const weekTasks = tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate >= nextWeek && dueDate < new Date(today.setDate(today.getDate() + 7));
+    });
+    if (weekTasks.length > 0) {
+      groups.push({
+        title: '最近7天',
+        tasks: weekTasks
+      });
+    }
+
+    // 更远的任务
     const laterTasks = tasks.filter(task => {
-      if (!task.dueDate) return false
-      const dueDate = new Date(task.dueDate)
-      return dueDate >= nextWeek
-    })
+      if (!task.dueDate) return false;
+      return new Date(task.dueDate) >= new Date(today.setDate(today.getDate() + 7));
+    });
     if (laterTasks.length > 0) {
       groups.push({
-        title: '以后',
+        title: '更远',
         tasks: laterTasks
-      })
+      });
     }
 
-    // 无日期任务
-    const noDateTasks = tasks.filter(task => !task.dueDate)
+    // 没有日期的任务
+    const noDateTasks = tasks.filter(task => !task.dueDate);
     if (noDateTasks.length > 0) {
       groups.push({
-        title: '无日期',
+        title: '没有日期',
         tasks: noDateTasks
-      })
+      });
     }
 
-    return groups
+    return groups;
   },
 
   // 切换任务完成状态
@@ -1057,116 +1108,72 @@ Page({
     }
   },
 
-  // 处理任务数据
+  // 处理任务数据，添加倒计时信息
   processTaskData(tasks) {
-    return tasks.map(task => ({
-      ...task,
-      countdown: this.calculateCountdown(task.dueDate)
-    }));
+    return tasks.map(task => {
+      if (task.dueDate) {
+        const dueDate = new Date(task.dueDate);
+        const now = new Date();
+        const diff = dueDate - now;
+
+        // 计算倒计时
+        if (diff > 0) {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          
+          if (days > 0) {
+            task.countdown = `剩余 ${days} 天`;
+          } else if (hours > 0) {
+            task.countdown = `剩余 ${hours} 小时`;
+          } else {
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            task.countdown = `剩余 ${minutes} 分钟`;
+          }
+        } else {
+          task.countdown = '已过期';
+        }
+
+        // 格式化显示日期
+        task.dueDate = this.formatDate(dueDate);
+      }
+      return task;
+    });
+  },
+
+  // 格式化日期
+  formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    
+    return `${month}-${day} ${hour}:${minute}`;
   },
 
   // 筛选任务
   filterTasks() {
-    const { tasks, filter } = this.data;
-    
-    if (filter === 'quadrant') {
-      // 象限视图处理
-      const quadrantTasks = {
-        0: [], 1: [], 2: [], 3: []
-      };
-      
-      tasks.forEach(task => {
-        if (!task.completed) {
-          quadrantTasks[task.priority].push(task);
-        }
-      });
-      
-      Object.keys(quadrantTasks).forEach(priority => {
-        quadrantTasks[priority] = this.processTaskData(quadrantTasks[priority]);
-      });
-      
-      this.setData({ quadrantTasks });
-    } else {
-      // 其他视图处理
-      let filteredTasks = [];
-      
-      if (filter === 'done') {
-        filteredTasks = tasks.filter(task => task.completed);
-        this.setData({ 
-          filteredTasks: this.processTaskData(filteredTasks)
-        });
-      } else if (filter === 'undone') {
-        filteredTasks = tasks.filter(task => !task.completed);
-        const taskGroups = this.groupUndoneTasksByDueDate(filteredTasks);
-        this.setData({ 
-          filteredTasks,
-          taskGroups
-        });
-      }
+    const { tasks, filter } = this.data
+    let filteredTasks = []
+
+    switch (filter) {
+      case 'done':
+        // 获取已完成任务并按完成时间排序
+        filteredTasks = tasks
+          .filter(task => task.completed)
+          .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+        break
+      case 'undone':
+        filteredTasks = tasks.filter(task => !task.completed)
+        break
+      default:
+        filteredTasks = tasks
     }
-  },
 
-  // 未完成任务按截止时间分组
-  groupUndoneTasksByDueDate(tasks) {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextWeek = new Date(today);
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    // 分组任务
-    const groups = [
-      {
-        title: '已过期',
-        tasks: tasks.filter(task => {
-          if (!task.dueDate) return false;
-          return new Date(task.dueDate) < today;
-        })
-      },
-      {
-        title: '今天',
-        tasks: tasks.filter(task => {
-          if (!task.dueDate) return false;
-          const dueDate = new Date(task.dueDate);
-          return dueDate >= today && dueDate < tomorrow;
-        })
-      },
-      {
-        title: '明天',
-        tasks: tasks.filter(task => {
-          if (!task.dueDate) return false;
-          const dueDate = new Date(task.dueDate);
-          return dueDate >= tomorrow && dueDate < nextWeek;
-        })
-      },
-      {
-        title: '最近7天',
-        tasks: tasks.filter(task => {
-          if (!task.dueDate) return false;
-          const dueDate = new Date(task.dueDate);
-          return dueDate >= nextWeek && dueDate < new Date(today.setDate(today.getDate() + 7));
-        })
-      },
-      {
-        title: '更远',
-        tasks: tasks.filter(task => {
-          if (!task.dueDate) return false;
-          return new Date(task.dueDate) >= new Date(today.setDate(today.getDate() + 7));
-        })
-      },
-      {
-        title: '没有日期',
-        tasks: tasks.filter(task => !task.dueDate)
-      }
-    ];
-
-    // 处理每个任务的倒计时信息
-    groups.forEach(group => {
-      group.tasks = this.processTaskData(group.tasks);
-    });
-
-    return groups;
+    this.setData({ 
+      filteredTasks,
+      taskGroups: this.groupTasks(filteredTasks)
+    })
   },
 
   // 开始拖拽任务
@@ -1265,44 +1272,110 @@ Page({
     });
   },
 
-  // 筛选任务
-  filterTasks() {
-    const { tasks, filter } = this.data;
-    
-    if (filter === 'quadrant') {
-      // 象限视图处理
-      const quadrantTasks = {
-        0: [], 1: [], 2: [], 3: []
-      };
-      
-      tasks.forEach(task => {
-        if (!task.completed) {
-          quadrantTasks[task.priority].push(task);
-        }
+  // 统一的任务详情页跳转方法
+  goToDetail(e) {
+    const { task } = e.currentTarget.dataset;
+    if (task && task.id) {
+      wx.navigateTo({
+        url: `/pages/task/detail/index?id=${task.id}`
       });
-      
-      Object.keys(quadrantTasks).forEach(priority => {
-        quadrantTasks[priority] = this.processTaskData(quadrantTasks[priority]);
-      });
-      
-      this.setData({ quadrantTasks });
-    } else {
-      // 其他视图处理
-      let filteredTasks = [];
-      
-      if (filter === 'done') {
-        filteredTasks = tasks.filter(task => task.completed);
-        this.setData({ 
-          filteredTasks: this.processTaskData(filteredTasks)
-        });
-      } else if (filter === 'undone') {
-        filteredTasks = tasks.filter(task => !task.completed);
-        const taskGroups = this.groupUndoneTasksByDueDate(filteredTasks);
-        this.setData({ 
-          filteredTasks,
-          taskGroups
-        });
-      }
     }
-  }
+  },
+
+  // 切换任务状态
+  toggleTaskStatus(e) {
+    const taskId = e.currentTarget.dataset.taskId
+    const task = this.data.tasks.find(t => t.id === taskId)
+    if (!task) return
+
+    // 先添加完成动画类
+    const tasks = this.data.tasks.map(t => {
+      if (t.id === taskId) {
+        return { ...t, completed: !t.completed, completing: true }
+      }
+      return t
+    })
+    
+    this.setData({ tasks })
+
+    // 等待动画完成后更新数据
+    setTimeout(() => {
+      try {
+        db.updateTask(taskId, {
+          completed: !task.completed,
+          completedTime: !task.completed ? new Date().toISOString() : null
+        })
+        this.loadTasks() // 重新加载任务列表
+      } catch (error) {
+        console.error('更新任务状态失败:', error)
+        wx.showToast({
+          title: '操作失败',
+          icon: 'error'
+        })
+      }
+    }, 800) // 与动画时长保持一致
+  },
+
+  // 根据ID查找任务
+  findTaskById(id) {
+    const tasks = wx.getStorageSync('tasks') || [];
+    return tasks.find(task => task.id === id);
+  },
+
+  // 拖拽到象限
+  onQuadrantDrop(e) {
+    const { dragTask } = this.data;
+    const priority = parseInt(e.currentTarget.dataset.priority);
+    if (!dragTask || isNaN(priority)) return;
+
+    try {
+      // 更新任务优先级
+      db.updateTaskPriority(dragTask.id, priority);
+      
+      // 重新加载任务列表
+      this.loadTasks();
+      
+      // 显示提示
+      wx.showToast({
+        title: '已更新优先级',
+        icon: 'success'
+      });
+    } catch (error) {
+      wx.showToast({
+        title: '操作失败',
+        icon: 'error'
+      });
+    } finally {
+      // 清除拖拽状态
+      this.setData({ dragTask: null });
+    }
+  },
+
+  // 格式化完成时间
+  formatCompletionTime(completedAt) {
+    if (!completedAt) return ''
+    
+    const completedDate = new Date(completedAt)
+    const now = new Date()
+    const diff = now - completedDate
+
+    // 一小时内
+    if (diff < 3600000) {
+      const minutes = Math.floor(diff / 60000)
+      return `${minutes}分钟前`
+    }
+    
+    // 24小时内
+    if (diff < 86400000) {
+      const hours = Math.floor(diff / 3600000)
+      return `${hours}小时前`
+    }
+    
+    // 超过24小时
+    const month = completedDate.getMonth() + 1
+    const date = completedDate.getDate()
+    const hours = completedDate.getHours().toString().padStart(2, '0')
+    const minutes = completedDate.getMinutes().toString().padStart(2, '0')
+    return `${month}月${date}日 ${hours}:${minutes}`
+  },
 }) 
