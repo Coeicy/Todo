@@ -1,11 +1,12 @@
 {
   "pages": [
+    "pages/calendar/calendar",
     "pages/index/index",
     "pages/notification/detail/index",
-    "pages/calendar/calendar",
     "pages/task/detail/index",
     "pages/task/add/index",
-    "pages/settings/settings"
+    "pages/settings/settings",
+    "pages/quadrant/quadrant"
   ],
   "window": {
     "backgroundTextStyle": "light",

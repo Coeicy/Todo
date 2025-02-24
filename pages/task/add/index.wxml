@@ -44,7 +44,13 @@
     </view>
 
     <view class="form-group">
-      <view class="group-title">⏰ 什么时候？</view>
+      <view class="group-title">
+        ⏰ 时间安排
+        <view class="all-day-switch">
+          <switch checked="{{form.isAllDay}}" bindchange="onAllDayChange"/>
+          <text>全天</text>
+        </view>
+      </view>
       <view class="form-item">
         <view class="time-inputs">
           <view class="time-row">

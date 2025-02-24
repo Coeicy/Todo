@@ -61,7 +61,7 @@ Page({
   updateStats(tasks) {
     this.setData({
       totalCount: tasks.length,
-      doneCount: tasks.filter(task => task.status === 'done').length,
+      doneCount: tasks.filter(task => task.completed).length,
       importantCount: tasks.filter(task => task.priority >= 2).length
     });
   },
@@ -73,9 +73,9 @@ Page({
     }
     switch (this.data.filter) {
       case 'done':
-        return tasks.filter(task => task.status === 'done');
+        return tasks.filter(task => task.completed);
       case 'todo':
-        return tasks.filter(task => task.status === 'pending');
+        return tasks.filter(task => !task.completed);
       default:
         return tasks;
     }
@@ -221,4 +221,4 @@ Page({
     this.setData({ quadrantTasks });
     return []; // 返回空数组，因为我们使用 quadrantTasks 来显示
   }
-}); 
+});

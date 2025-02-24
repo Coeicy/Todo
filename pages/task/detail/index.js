@@ -30,30 +30,19 @@ Page({
     }
   },
 
-  // 加载任务数据
-  loadTask(id) {
+  async loadTask(taskId) {
     try {
-      const task = db.getTask(id)
-      if (task) {
-        this.setData({
-          task,
-          editForm: { ...task },
-          loading: false
-        })
-      } else {
-        wx.showToast({
-          title: '任务不存在',
-          icon: 'error'
-        })
-        setTimeout(() => wx.navigateBack(), 1500)
+      const task = db.getTasks().find(t => t.id === taskId)
+      if (!task) {
+        throw new Error('任务不存在')
       }
+      this.setData({ task, loading: false })
     } catch (error) {
       console.error('加载任务失败:', error)
       wx.showToast({
         title: '加载失败',
         icon: 'error'
       })
-      setTimeout(() => wx.navigateBack(), 1500)
     }
   },
 

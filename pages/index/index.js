@@ -41,7 +41,6 @@ Page({
   },
 
   onShow() {
-    // 每次页面显示时重新加载任务
     this.loadTasks()
   },
 
@@ -71,141 +70,65 @@ Page({
   },
 
   // 加载任务列表
-  loadTasks() {
+  async loadTasks() {
     try {
-      const tasks = db.getTasks()
-      const formattedTasks = tasks.map(task => ({
-        ...task,
-        completionTime: this.formatCompletionTime(task.completedAt)
-      }))
-      
-      this.setData({ tasks: formattedTasks })
+      const tasks = db.getTasks();
+      this.setData({
+        tasks,
+        totalTasks: tasks.length,
+        completedTasks: tasks.filter(t => t.completed).length,
+        filteredTasks: this.filterTasks(tasks)
+      });
+      this.groupTasksByQuadrant(tasks);
     } catch (error) {
-      console.error('加载任务失败:', error)
+      console.error('加载任务失败:', error);
       wx.showToast({
         title: '加载失败',
         icon: 'error'
-      })
+      });
     }
   },
 
-  // 处理象限视图的任务
-  processQuadrantTasks(tasks) {
+  filterTasks(tasks) {
+    return tasks.filter(task => this.data.filter === 'undone' ? !task.completed : task.completed);
+  },
+
+  groupTasksByQuadrant(tasks) {
     const quadrantTasks = {
-      0: [], // 不重要不紧急
-      1: [], // 不重要但紧急
-      2: [], // 重要不紧急
-      3: []  // 重要且紧急
-    }
+      0: [],
+      1: [],
+      2: [],
+      3: []
+    };
+
+    const now = new Date().getTime();
+    const urgentThreshold = 24 * 60 * 60 * 1000; // 24小时内视为紧急
 
     tasks.forEach(task => {
-      if (!task.completed) {
-        quadrantTasks[task.priority].push(task)
+      const isUrgent = task.startTime && (task.startTime - now < urgentThreshold);
+      const isImportant = task.priority >= 2;
+
+      if (isImportant && isUrgent) {
+        quadrantTasks[3].push(task);
+      } else if (isImportant) {
+        quadrantTasks[2].push(task);
+      } else if (isUrgent) {
+        quadrantTasks[1].push(task);
+      } else {
+        quadrantTasks[0].push(task);
       }
-    })
+    });
 
-    this.setData({ quadrantTasks })
+    this.setData({ quadrantTasks });
   },
 
-  // 处理过滤后的任务
-  processFilteredTasks(tasks) {
-    let filteredTasks = []
-    const filter = this.data.filter
-
-    if (filter === 'done') {
-      filteredTasks = tasks.filter(task => task.completed)
-    } else if (filter === 'undone') {
-      filteredTasks = tasks.filter(task => !task.completed)
-      const taskGroups = this.groupTasksByDueDate(filteredTasks)
-      this.setData({ taskGroups })
-    }
-
-    this.setData({ filteredTasks })
-  },
-
-  // 按截止时间对任务进行分组
-  groupTasksByDueDate(tasks) {
-    const groups = [];
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextWeek = new Date(today);
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    // 已过期的任务
-    const overdueTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
-      return new Date(task.dueDate) < today;
-    });
-    if (overdueTasks.length > 0) {
-      groups.push({
-        title: '已过期',
-        tasks: overdueTasks
-      });
-    }
-
-    // 今天的任务
-    const todayTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
-      const dueDate = new Date(task.dueDate);
-      return dueDate >= today && dueDate < tomorrow;
-    });
-    if (todayTasks.length > 0) {
-      groups.push({
-        title: '今天',
-        tasks: todayTasks
-      });
-    }
-
-    // 明天的任务
-    const tomorrowTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
-      const dueDate = new Date(task.dueDate);
-      return dueDate >= tomorrow && dueDate < nextWeek;
-    });
-    if (tomorrowTasks.length > 0) {
-      groups.push({
-        title: '明天',
-        tasks: tomorrowTasks
-      });
-    }
-
-    // 最近7天的任务
-    const weekTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
-      const dueDate = new Date(task.dueDate);
-      return dueDate >= nextWeek && dueDate < new Date(today.setDate(today.getDate() + 7));
-    });
-    if (weekTasks.length > 0) {
-      groups.push({
-        title: '最近7天',
-        tasks: weekTasks
-      });
-    }
-
-    // 更远的任务
-    const laterTasks = tasks.filter(task => {
-      if (!task.dueDate) return false;
-      return new Date(task.dueDate) >= new Date(today.setDate(today.getDate() + 7));
-    });
-    if (laterTasks.length > 0) {
-      groups.push({
-        title: '更远',
-        tasks: laterTasks
-      });
-    }
-
-    // 没有日期的任务
-    const noDateTasks = tasks.filter(task => !task.dueDate);
-    if (noDateTasks.length > 0) {
-      groups.push({
-        title: '没有日期',
-        tasks: noDateTasks
-      });
-    }
-
-    return groups;
+  // 计算任务统计数据
+  calculateTaskStats(tasks) {
+    return {
+      totalTasks: tasks.length,
+      completedTasks: tasks.filter(t => t.completed).length,
+      importantTasks: tasks.filter(t => t.priority >= 2).length
+    };
   },
 
   // 切换任务完成状态
@@ -1062,7 +985,7 @@ Page({
   // 创建任务
   async createTask(taskData) {
     try {
-      const task = db.addTask(taskData)
+      const task = await db.addTask(taskData)
       
       // 如果设置了截止时间，请求权限并创建提醒
       if (task.dueDate) {
@@ -1081,9 +1004,9 @@ Page({
 
   // 设置筛选类型
   setFilter(e) {
-    const type = e.currentTarget.dataset.type;
-    this.setData({ filter: type });
-    this.filterTasks();
+    const filter = e.currentTarget.dataset.type;
+    this.setData({ filter });
+    this.loadTasks(); // 重新加载任务以应用过滤
   },
 
   // 计算倒计时
@@ -1149,31 +1072,6 @@ Page({
     const minute = date.getMinutes().toString().padStart(2, '0');
     
     return `${month}-${day} ${hour}:${minute}`;
-  },
-
-  // 筛选任务
-  filterTasks() {
-    const { tasks, filter } = this.data
-    let filteredTasks = []
-
-    switch (filter) {
-      case 'done':
-        // 获取已完成任务并按完成时间排序
-        filteredTasks = tasks
-          .filter(task => task.completed)
-          .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
-        break
-      case 'undone':
-        filteredTasks = tasks.filter(task => !task.completed)
-        break
-      default:
-        filteredTasks = tasks
-    }
-
-    this.setData({ 
-      filteredTasks,
-      taskGroups: this.groupTasks(filteredTasks)
-    })
   },
 
   // 开始拖拽任务
@@ -1267,9 +1165,7 @@ Page({
 
   // 跳转到添加任务页面
   goToAdd() {
-    wx.navigateTo({
-      url: '/pages/task/add/index'
-    });
+    this.setData({ showAddTaskModal: true });
   },
 
   // 统一的任务详情页跳转方法
@@ -1377,5 +1273,154 @@ Page({
     const hours = completedDate.getHours().toString().padStart(2, '0')
     const minutes = completedDate.getMinutes().toString().padStart(2, '0')
     return `${month}月${date}日 ${hours}:${minutes}`
+  },
+
+  // 优化任务分组逻辑
+  groupTasks(tasks) {
+    if (!Array.isArray(tasks)) {
+      return [];
+    }
+
+    const groupedTasks = tasks.reduce((acc, task) => {
+      if (!task.startTime) return acc;
+      
+      const dateKey = `${task.startTime.year}-${task.startTime.month}-${task.startTime.day}`;
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(task);
+      return acc;
+    }, {});
+
+    return Object.entries(groupedTasks)
+      .map(([date, tasks]) => ({
+        date,
+        tasks: this.sortTasksByTime(tasks)
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  },
+
+  // 抽取任务排序逻辑
+  sortTasksByTime(tasks) {
+    return tasks.sort((a, b) => {
+      if (a.isAllDay !== b.isAllDay) {
+        return a.isAllDay ? -1 : 1;
+      }
+      return this.compareTaskTime(a, b);
+    });
+  },
+
+  compareTaskTime(a, b) {
+    const aTime = `${a.startTime.hour}:${a.startTime.minute}`;
+    const bTime = `${b.startTime.hour}:${b.startTime.minute}`;
+    return aTime.localeCompare(bTime);
+  },
+
+  // 优化象限分组逻辑
+  groupTasksByQuadrant(tasks) {
+    if (!Array.isArray(tasks)) {
+      return;
+    }
+    
+    const now = new Date();
+    const quadrantTasks = {
+      0: [], // 不重要不紧急
+      1: [], // 不重要但紧急
+      2: [], // 重要不紧急
+      3: []  // 重要且紧急
+    };
+
+    tasks.forEach(task => {
+      if (task.completed) return;
+
+      const priority = task.priority || 0;
+      const isUrgent = this.isTaskUrgent(task, now);
+      const quadrant = this.determineQuadrant(priority, isUrgent);
+      
+      if (quadrantTasks[quadrant]) {
+        quadrantTasks[quadrant].push(task);
+      }
+    });
+
+    this.setData({ quadrantTasks });
+  },
+
+  // 判断任务是否紧急
+  isTaskUrgent(task, now) {
+    if (!task.dueDate) return false;
+    const dueDate = new Date(task.dueDate);
+    const timeDiff = dueDate.getTime() - now.getTime();
+    return timeDiff <= 24 * 60 * 60 * 1000; // 24小时内视为紧急
+  },
+
+  // 确定任务象限
+  determineQuadrant(priority, isUrgent) {
+    if (priority >= 2 && isUrgent) return 3;
+    if (priority >= 2) return 2;
+    if (isUrgent) return 1;
+    return 0;
+  },
+
+  // 优化表单提交逻辑
+  async submitForm() {
+    try {
+      if (!this.validateForm()) {
+        return;
+      }
+
+      const taskData = this.formatTaskData();
+      await db.addTask(taskData);
+      
+      this.loadTasks();
+      this.resetForm();
+      
+      wx.showToast({ 
+        title: '任务添加成功', 
+        icon: 'success' 
+      });
+    } catch (error) {
+      console.error('添加任务失败:', error);
+      wx.showToast({ 
+        title: '添加失败: ' + error.message, 
+        icon: 'none' 
+      });
+    }
+  },
+
+  // 表单验证
+  validateForm() {
+    const { title } = this.data.newTask;
+    if (!title.trim()) {
+      wx.showToast({
+        title: '请输入任务标题',
+        icon: 'none'
+      });
+      return false;
+    }
+    return true;
+  },
+
+  // 重置表单
+  resetForm() {
+    this.setData({
+      newTask: {
+        title: '',
+        notes: '',
+        important: false,
+        startTime: '',
+        dueDate: '',
+        location: '',
+        url: ''
+      },
+      showAddTaskModal: false
+    });
+  },
+
+  toggleComplete() {
+    const { task } = this.data;
+    this.updateTask({
+      completed: !task.completed,
+      completedTime: !task.completed ? new Date().toISOString() : null
+    });
   },
 }) 

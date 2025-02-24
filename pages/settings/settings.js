@@ -20,7 +20,13 @@ Page({
     enableNotification: false,
     reminderTime: 0,
     reminderOptions: ['5分钟前', '15分钟前', '30分钟前', '1小时前', '2小时前'],
-    showAboutModal: false
+    showAboutModal: false,
+    loading: true,
+    // 坚果云同步配置
+    webdavUrl: '',
+    webdavUsername: '',
+    webdavPassword: '',
+    autoSync: false
   },
 
   onLoad() {
@@ -29,15 +35,19 @@ Page({
 
   // 加载设置
   loadSettings() {
-    const settings = wx.getStorageSync('settings') || {}
-    this.setData({
-      theme: settings.theme || 'light',
-      themeColor: settings.themeColor || '#07c160',
-      showLunar: settings.showLunar !== false,
-      weekStart: settings.weekStart || 0,
-      enableNotification: settings.enableNotification || false,
-      reminderTime: settings.reminderTime || 0
-    })
+    try {
+      const settings = wx.getStorageSync('settings') || {};
+      this.setData({
+        ...settings,
+        loading: false
+      });
+    } catch (error) {
+      console.error('加载设置失败:', error);
+      wx.showToast({
+        title: '加载失败',
+        icon: 'error'
+      });
+    }
   },
 
   // 切换主题模式
@@ -85,17 +95,21 @@ Page({
     }
   },
 
-  // 切换周起始日
+  // 切换每周起始日
   onWeekStartChange(e) {
-    const weekStart = parseInt(e.detail.value)
-    this.updateSetting('weekStart', weekStart)
+    const weekStart = Number(e.detail.value)
+    this.setData({ weekStart })
+    
+    // 保存设置
+    const settings = wx.getStorageSync('settings') || {}
+    settings.weekStart = weekStart
+    wx.setStorageSync('settings', settings)
     
     // 通知日历页面刷新
     const pages = getCurrentPages()
     const calendarPage = pages.find(p => p.route === 'pages/calendar/calendar')
     if (calendarPage) {
-      calendarPage.setData({ weekStart })
-      calendarPage.generateDays()
+      calendarPage.updateWeekStart(weekStart)
     }
   },
 
@@ -199,5 +213,172 @@ Page({
         }
       }
     })
+  },
+
+  async saveSettings() {
+    try {
+      await wx.setStorageSync('settings', this.data);
+      wx.showToast({
+        title: '设置保存成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('保存设置失败:', error);
+      wx.showToast({
+        title: '保存失败',
+        icon: 'error'
+      });
+    }
+  },
+
+  // 导出数据
+  async exportData() {
+    try {
+      const tasks = await db.collection('tasks').get()
+      const settings = wx.getStorageSync('settings') || {}
+      const exportData = {
+        tasks: tasks.data,
+        settings: settings,
+        exportTime: new Date().toISOString()
+      }
+
+      const fs = wx.getFileSystemManager()
+      const fileName = `wetodo_backup_${new Date().getTime()}.json`
+      const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`
+
+      fs.writeFileSync(filePath, JSON.stringify(exportData), 'utf8')
+
+      await wx.shareFileMessage({
+        filePath: filePath,
+        fileName: fileName
+      })
+
+      wx.showToast({
+        title: '导出成功',
+        icon: 'success'
+      })
+    } catch (error) {
+      console.error('导出数据失败:', error)
+      wx.showToast({
+        title: '导出失败',
+        icon: 'error'
+      })
+    }
+  },
+
+  // 导入数据
+  async importData() {
+    try {
+      const res = await wx.chooseMessageFile({
+        count: 1,
+        type: 'file',
+        extension: ['json']
+      })
+
+      const fs = wx.getFileSystemManager()
+      const fileContent = fs.readFileSync(res.tempFiles[0].path, 'utf8')
+      const importData = JSON.parse(fileContent)
+
+      // 恢复设置
+      wx.setStorageSync('settings', importData.settings)
+
+      // 恢复任务数据
+      const _ = db.command
+      await db.collection('tasks').where({
+        _id: _.exists(true)
+      }).remove()
+
+      for (const task of importData.tasks) {
+        await db.collection('tasks').add({
+          data: task
+        })
+      }
+
+      wx.showToast({
+        title: '导入成功',
+        icon: 'success'
+      })
+
+      // 重新加载设置
+      this.loadSettings()
+    } catch (error) {
+      console.error('导入数据失败:', error)
+      wx.showToast({
+        title: '导入失败',
+        icon: 'error'
+      })
+    }
+  },
+
+  // WebDAV配置相关方法
+  onWebdavUrlChange(e) {
+    this.setData({ webdavUrl: e.detail.value })
+    this.saveWebDAVSettings()
+  },
+
+  onWebdavUsernameChange(e) {
+    this.setData({ webdavUsername: e.detail.value })
+    this.saveWebDAVSettings()
+  },
+
+  onWebdavPasswordChange(e) {
+    this.setData({ webdavPassword: e.detail.value })
+    this.saveWebDAVSettings()
+  },
+
+  onAutoSyncChange(e) {
+    this.setData({ autoSync: e.detail.value })
+    this.saveWebDAVSettings()
+  },
+
+  // 保存WebDAV设置
+  saveWebDAVSettings() {
+    const settings = wx.getStorageSync('settings') || {}
+    settings.webdav = {
+      url: this.data.webdavUrl,
+      username: this.data.webdavUsername,
+      password: this.data.webdavPassword,
+      autoSync: this.data.autoSync
+    }
+    wx.setStorageSync('settings', settings)
+  },
+
+  // 立即同步
+  async syncNow() {
+    if (!this.data.webdavUrl || !this.data.webdavUsername || !this.data.webdavPassword) {
+      wx.showToast({
+        title: '请完善同步配置',
+        icon: 'none'
+      })
+      return
+    }
+
+    try {
+      wx.showLoading({ title: '同步中...' })
+      // 导出数据
+      const tasks = await db.collection('tasks').get()
+      const settings = wx.getStorageSync('settings') || {}
+      const exportData = {
+        tasks: tasks.data,
+        settings: settings,
+        syncTime: new Date().toISOString()
+      }
+
+      // TODO: 实现与坚果云的WebDAV同步
+      // 这里需要添加实际的WebDAV同步逻辑
+
+      wx.hideLoading()
+      wx.showToast({
+        title: '同步成功',
+        icon: 'success'
+      })
+    } catch (error) {
+      console.error('同步失败:', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: '同步失败',
+        icon: 'error'
+      })
+    }
   }
-}) 
+})

@@ -28,6 +28,9 @@ Component({
 
   methods: {
     onClick() {
+      if (this.data.count > 0) {
+        wx.vibrateShort();
+      }
       this.triggerEvent('click')
     }
   }

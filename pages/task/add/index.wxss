@@ -31,6 +31,7 @@
   color: #333;
   border-bottom: 1rpx solid #f5f5f5;
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -627,4 +628,17 @@ textarea[data-field="notes"]::placeholder {
   font-size: 28rpx;
   font-weight: 300;  /* 确保使用细字重 */
   opacity: 0.7;  /* 保持一致的透明度 */
+}
+
+/* 全天任务开关样式 */
+.all-day-switch {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.all-day-switch switch {
+  transform: scale(0.8);
 } 

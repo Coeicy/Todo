@@ -1,39 +1,88 @@
+/* 象限容器 */
 .quadrant-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.quadrant {
-  width: 50%;
   padding: 20rpx;
-  box-sizing: border-box;
+  background: var(--background-color);
 }
 
-.title {
+/* 任务输入区域 */
+.task-input {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.task-input .picker {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 6rpx;
+  font-size: 26rpx;
+}
+
+.task-input input {
+  flex: 1;
+  height: 64rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 6rpx;
+  padding: 0 20rpx;
+}
+
+.task-input button {
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 6rpx;
+  margin: 0;
+}
+
+/* 象限区域 */
+.quadrant {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.quadrant .title {
   font-size: 28rpx;
   font-weight: bold;
-  margin-bottom: 10rpx;
+  color: var(--text-color);
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-color);
 }
 
+/* 任务项 */
 .task {
-  padding: 10rpx;
-  margin: 5rpx 0;
-  background-color: #f5f5f5;
-  border-radius: 5rpx;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
 }
 
-.task-input {
-  margin-bottom: 20rpx;
+.task:last-child {
+  border-bottom: none;
 }
 
-.picker {
-  border: 1rpx solid #ccc;
-  padding: 10rpx;
-  margin: 10rpx 0;
+.task checkbox {
+  margin-right: 16rpx;
 }
 
-.delete {
-  color: red;
-  margin-left: 20rpx;
-  cursor: pointer;
-} 
+.task-content {
+  font-size: 28rpx;
+  color: var(--text-color);
+  flex: 1;
+}
+
+/* 已完成任务样式 */
+.task.completed .task-content {
+  text-decoration: line-through;
+  color: var(--text-color-light);
+}

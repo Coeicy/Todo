@@ -1,64 +1,98 @@
-<view class="container">
-  <!-- 日历组件 -->
-  <calendar 
-    show-lunar="{{true}}"
-    show-festival="{{true}}"
-    show-solar-term="{{true}}"
-    show-task-dots="{{true}}"
-    tasks="{{tasks}}"
-    bind:select="onDateSelect"
-    bind:monthChange="onMonthChange"
-    bind:today="onGoToday"
-  />
-
-  <!-- 选中日期详情 -->
-  <view class="date-detail" wx:if="{{selectedDate}}">
-    <view class="detail-header">
-      <view class="date-info">
-        <text class="solar-date">{{selectedDate.fullDate}}</text>
-        <text class="lunar-date">{{selectedDate.lunar}}</text>
+<view class="calendar-page">
+  <!-- 顶部导航栏：年月选择和今日按钮 -->
+  <view class="header">
+    <view class="date-inputs">
+      <!-- 年份输入框 -->
+      <view class="input-group">
+        <input class="year-input" 
+               type="number" 
+               value="{{currentYear}}"
+               maxlength="4"
+               bindinput="onYearInput"
+               bindblur="onYearBlur"/>
+        <text class="label" bindtap="goToCurrentYear">年</text>
       </view>
-      <view class="festival-info" wx:if="{{selectedDate.holiday || selectedDate.term}}">
-        <text class="festival">{{selectedDate.holiday}}</text>
-        <text class="term">{{selectedDate.term}}</text>
+      <!-- 月份输入框 -->
+      <view class="input-group">
+        <input class="month-input" 
+               type="number" 
+               value="{{currentMonth}}"
+               maxlength="2"
+               bindinput="onMonthInput"
+               bindblur="onMonthBlur"/>
+        <text class="label">月</text>
       </view>
-    </view>
-
-    <view class="fortune-section">
-      <view class="section-title">今日运势</view>
-      <view class="fortune-content">
-        <view class="suitable">
-          <text class="label">宜：</text>
-          <text class="value">{{selectedDate.suitable}}</text>
-        </view>
-        <view class="unsuitable">
-          <text class="label">忌：</text>
-          <text class="value">{{selectedDate.unsuitable}}</text>
-        </view>
+      <!-- 返回今日按钮 -->
+      <view class="today-btn {{todayBtnActive ? 'active' : 'inactive'}}" bindtap="goToToday">
+        今
       </view>
     </view>
+  </view>
 
-    <view class="tasks-section">
-      <view class="section-header">
-        <text class="title">当日任务</text>
-        <view class="add-btn" bindtap="addTask">添加任务</view>
+  <!-- 星期栏：显示周一至周日 -->
+  <view class="weekdays">
+    <view class="weekday {{index + 1 === currentWeekday ? 'current' : ''}}" 
+          wx:for="{{weekdays}}" 
+          wx:key="*this">
+      <view class="weekday-text">
+        <text class="weekday-cn">{{item}}</text>
+        <text class="weekday-en">{{['MON','TUE','WED','THU','FRI','SAT','SUN'][index]}}</text>
       </view>
-      <view class="task-list">
-        <view class="task-item" 
-              wx:for="{{selectedDate.tasks}}" 
-              wx:key="id"
-              bindtap="showTaskDetail"
-              data-task="{{item}}">
-          <view class="task-status {{item.completed ? 'completed' : ''}}"></view>
-          <view class="task-content">
-            <view class="task-title">{{item.title}}</view>
-            <view class="task-time" wx:if="{{item.startTime}}">
-              {{item.startTime}} - {{item.dueDate}}
+    </view>
+  </view>
+
+  <!-- 日历主体：可滑动的日期网格 -->
+  <view class="calendar-body" 
+        bind:touchstart="onTouchStart"
+        bind:touchmove="onTouchMove" 
+        bind:touchend="onTouchEnd">
+    <!-- 日历滑动容器 -->
+    <view class="calendar-slider {{isTransitioning ? 'transitioning' : ''}}"
+          style="transform: translateY({{translateY}}px); {{touching ? 'transition: none;' : ''}}">
+      <!-- 月份容器：包含上月、当月、下月 -->
+      <view class="month-container {{index === 1 ? 'current' : ''}}"
+            wx:for="{{monthContainers}}" 
+            wx:key="id">
+        <!-- 日期网格：5行7列 -->
+        <view class="days-grid" wx:for="{{item.days}}" wx:key="index" wx:for-item="week">
+          <!-- 日期格子 -->
+          <view class="day-cell {{day.isCurrentMonth ? 'current-month' : 'other-month'}} {{day.isToday ? 'today' : ''}} {{day.fullDate === selectedDate.fullDate ? 'selected' : ''}}"
+                wx:for="{{week}}" 
+                wx:key="fullDate"
+                wx:for-item="day"
+                data-date="{{day.fullDate}}"
+                bindtap="selectDate">
+            
+            <view class="cell-header">
+              <text class="date">{{day.day}}</text>
+              <block wx:if="{{day.holiday}}">
+                <text class="holiday">{{day.holiday}}</text>
+              </block>
+              <block wx:elif="{{day.workday}}">
+                <text class="workday">补班</text>
+              </block>
+              <block wx:else>
+                <text class="lunar">{{day.lunar}}</text>
+              </block>
+            </view>
+
+            <view class="task-area">
+              <block wx:if="{{day.tasks.length}}">
+                <!-- 显示前3个任务 -->
+                <view class="task-item" 
+                      wx:for="{{day.tasks}}" 
+                      wx:key="id" 
+                      wx:for-item="task"
+                      wx:if="{{index < 3}}">
+                  {{task.title}}
+                </view>
+                <!-- 如果有更多任务，显示+N -->
+                <view class="more-tasks" wx:if="{{day.tasks.length > 3}}">
+                  +{{day.tasks.length - 3}}
+                </view>
+              </block>
             </view>
           </view>
-        </view>
-        <view class="empty-tip" wx:if="{{!selectedDate.tasks.length}}">
-          暂无任务
         </view>
       </view>
     </view>

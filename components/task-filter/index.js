@@ -4,6 +4,10 @@ Component({
     current: {
       type: String,
       value: 'all'
+    },
+    filters: {
+      type: Array,
+      value: []
     }
   },
 
@@ -19,10 +23,8 @@ Component({
   methods: {
     // 切换过滤器
     onFilterChange(e) {
-      const { filter } = e.currentTarget.dataset
-      if (filter !== this.properties.current) {
-        this.triggerEvent('change', { filter })
-      }
+      const { filter } = e.currentTarget.dataset;
+      this.triggerEvent('filterChange', { filter });
     }
   }
 }) 

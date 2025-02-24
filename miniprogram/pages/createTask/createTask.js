@@ -8,10 +8,9 @@ Page({
   },
 
   onLoad() {
-    // 初始化日期选择器
-    const now = new Date()
+    // 初始化时不设置默认日期
     this.setData({
-      dueDate: now.toISOString().split('T')[0]
+      dueDate: ''
     })
   },
 
@@ -64,6 +63,15 @@ Page({
     this.setData({ attachments })
   },
 
+  // 验证日期格式
+  validateDate(date) {
+    if (!date) return true; // 空日期是有效的
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) return false;
+    const dateObj = new Date(date);
+    return dateObj instanceof Date && !isNaN(dateObj);
+  },
+
   // 提交表单
   handleSubmit() {
     if (!this.data.taskName) {
@@ -74,10 +82,19 @@ Page({
       return
     }
 
+    // 验证日期（如果有输入）
+    if (this.data.dueDate && !this.validateDate(this.data.dueDate)) {
+      wx.showToast({
+        title: '请输入有效的日期',
+        icon: 'none'
+      })
+      return
+    }
+
     const task = {
       id: Date.now(),
       name: this.data.taskName,
-      dueDate: this.data.dueDate,
+      dueDate: this.data.dueDate || null,
       location: this.data.location,
       notes: this.data.notes,
       attachments: this.data.attachments,

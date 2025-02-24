@@ -1,10 +1,11 @@
-const notification = require('../../../utils/notification')
+const app = getApp();
+const notification = require('../../../utils/notification');
 
 Page({
   data: {
     logs: [],
     stats: {},
-    loading: false,
+    loading: true,
     page: 1,
     pageSize: 20,
     totalPages: 1,
@@ -17,7 +18,20 @@ Page({
   },
 
   onLoad() {
-    this.loadLogs()
+    this.loadNotificationLogs();
+  },
+
+  async loadNotificationLogs() {
+    try {
+      const logs = await notification.getRecentNotifications();
+      this.setData({ logs, loading: false });
+    } catch (error) {
+      console.error('加载通知日志失败:', error);
+      wx.showToast({
+        title: '加载失败',
+        icon: 'error'
+      });
+    }
   },
 
   // 加载日志数据

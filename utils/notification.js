@@ -130,46 +130,12 @@ class NotificationManager {
   }
 
   // 修改 scheduleTaskReminder 方法
-  async scheduleTaskReminder(task, minutesBefore) {
-    if (!task?.dueDate) return false
-
-    const reminderTime = this.calculateReminderTime(task.dueDate, minutesBefore)
+  async scheduleTaskReminder(task) {
     try {
-      this._validateTime(reminderTime)
+      // 设置通知逻辑
     } catch (error) {
-      console.error('提醒时间无效:', error)
-      return false
-    }
-
-    try {
-      const res = await wx.requestSubscribeMessage({
-        tmplIds: [this.templates.taskReminder]
-      })
-
-      if (res[this.templates.taskReminder] === 'accept') {
-        const notification = await this._sendNotification(task, 'taskReminder', {
-          title: task.title,
-          time: reminderTime.toLocaleString(),
-          note: `任务将在${minutesBefore}分钟后到期`
-        })
-
-        // 记录提醒设置
-        wx.setStorageSync(this._getReminderKey(task.id), {
-          taskId: task.id,
-          notificationId: notification.id,
-          reminderTime: reminderTime.toISOString(),
-          minutesBefore,
-          setAt: new Date().toISOString(),
-          cancelled: false,
-          status: this.STATUS.PENDING,
-          updateTime: new Date().toISOString()
-        })
-        
-        return true
-      }
-    } catch (error) {
-      console.error('设置任务提醒失败:', error)
-      return false
+      console.error('设置任务提醒失败:', error);
+      throw error;
     }
   }
 

@@ -1,23 +1,17 @@
 const app = getApp()
+const db = require('../../../utils/db')
 
 Page({
   data: {
     form: {
       title: '',
-      priority: 0,
-      startYear: '',
-      startMonth: '',
-      startDay: '',
-      startHour: '',
-      startMinute: '',
-      endYear: '',
-      endMonth: '',
-      endDay: '',
-      endHour: '',
-      endMinute: '',
+      priority: 0,  // 默认普通优先级
+      startTime: '',
+      dueDate: '',
       location: '',
       notes: '',
-      url: ''
+      url: '',
+      isAllDay: false
     },
     submitLoading: false,
     titleHeight: 44,    // 任务标题高度
@@ -27,6 +21,23 @@ Page({
     textareaHeights: {}, // 存储每个textarea的实际高度
     keyboardHeight: 0,   // 键盘高度
     attachments: []
+  },
+
+  onLoad(options) {
+    // 只有从日历页面点击日期进入时才预填充日期
+    if (options.date && options.fromCalendar) {
+      const date = new Date(options.date)
+      
+      this.setData({
+        'form.startTime': date.toISOString().split('T')[0],
+        'form.dueDate': date.toISOString().split('T')[0],
+        'form.isAllDay': true,
+        'form.startHour': '00',
+        'form.startMinute': '00',
+        'form.endHour': '23',
+        'form.endMinute': '59'
+      })
+    }
   },
 
   // 表单输入处理
@@ -60,15 +71,24 @@ Page({
 
   // 提交表单
   async submitForm() {
-    if (!this.validateForm()) return;
-    
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.setData({ submitLoading: true });
+
     try {
-      await this.saveTask();
-      wx.navigateBack();
-    } catch (err) {
+      const taskData = this.formatTaskData();
+      await db.addTask(taskData);
       wx.showToast({
-        title: '保存失败',
+        title: '任务添加成功',
+        icon: 'success'
+      });
+      wx.navigateBack();
+    } catch (error) {
+      console.error('添加任务失败:', error);
+      wx.showToast({
+        title: '添加失败',
         icon: 'error'
       });
     } finally {
@@ -90,94 +110,49 @@ Page({
   },
 
   // 保存任务
-  async saveTask() {
+  async saveTask(taskData) {
     try {
-      // 1. 整理表单数据
-      const taskData = this.formatTaskData();
+      const { attachments } = this.data;
       
-      // 2. 添加任务到数据库
-      const newTask = db.addTask({
+      // 构建任务数据
+      const taskDataWithAttachments = {
         ...taskData,
-        completed: false,
-        priority: parseInt(this.data.form.priority || 0),
-        createTime: new Date().toISOString(),
-        updateTime: new Date().toISOString()
+        attachments: attachments
+      };
+
+      // 添加任务
+      await db.addTask(taskDataWithAttachments);
+      
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
       });
 
-      if (newTask) {
-        // 3. 显示成功提示
-        wx.showToast({
-          title: '添加成功',
-          icon: 'success'
-        });
-
-        // 4. 获取首页实例并刷新
-        const pages = getCurrentPages();
-        const indexPage = pages.find(p => p.route === 'pages/index/index');
-        if (indexPage) {
-          // 确保回到未完成视图
-          indexPage.setData({
-            filter: 'undone'
-          }, () => {
-            indexPage.loadTasks();
-          });
-        }
-
-        // 5. 延迟返回上一页
-        setTimeout(() => {
-          wx.navigateBack();
-        }, 1500);
-
-        return newTask.id;
+      // 获取页面栈中的首页实例并刷新
+      const pages = getCurrentPages();
+      const indexPage = pages.find(p => p.route === 'pages/index/index');
+      if (indexPage) {
+        indexPage.loadTasks(); // 刷新首页任务列表
       }
-    } catch (err) {
-      console.error('保存任务失败:', err);
+
+      // 获取日历页面实例并刷新
+      const calendarPage = pages.find(p => p.route === 'pages/calendar/calendar');
+      if (calendarPage) {
+        calendarPage.loadTasks(); // 刷新日历页面任务
+      }
+
+      // 延迟返回，确保提示显示
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+
+    } catch (error) {
+      console.error('保存任务失败:', error);
       wx.showToast({
         title: '保存失败',
         icon: 'error'
       });
-      throw err;
     }
-  },
-
-  // 格式化任务数据
-  formatTaskData() {
-    const { form } = this.data;
-    
-    // 构建开始时间
-    let startTime = null;
-    if (form.startYear && form.startMonth && form.startDay) {
-      startTime = new Date(
-        parseInt(form.startYear),
-        parseInt(form.startMonth) - 1,
-        parseInt(form.startDay),
-        parseInt(form.startHour) || 0,
-        parseInt(form.startMinute) || 0
-      ).toISOString();
-    }
-
-    // 构建截止时间
-    let dueDate = null;
-    if (form.endYear && form.endMonth && form.endDay) {
-      dueDate = new Date(
-        parseInt(form.endYear),
-        parseInt(form.endMonth) - 1,
-        parseInt(form.endDay),
-        parseInt(form.endHour) || 23,
-        parseInt(form.endMinute) || 59
-      ).toISOString();
-    }
-
-    return {
-      title: form.title.trim(),
-      notes: form.notes.trim(),
-      startTime,
-      dueDate,
-      location: form.location.trim(),
-      url: form.url.trim(),
-      attachments: this.data.attachments || [],
-      important: form.important || false
-    };
   },
 
   // 保存附件信息
@@ -463,6 +438,22 @@ Page({
     }
   },
 
+  // 验证日期时间
+  validateDateTime() {
+    const { startTime, dueDate } = this.data.form;
+    
+    // 如果都未设置，则验证通过
+    if (!startTime && !dueDate) {
+      wx.showToast({
+        title: '开始时间不能晚于结束时间',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    return true;
+  },
+
   onLineChange(e) {
     const { lineCount } = e.detail;
     const lineHeight = 44; // 每行高度（rpx）
@@ -588,4 +579,233 @@ Page({
       }
     });
   },
-}) 
+
+  // 切换全天事件
+  onAllDayChange(e) {
+    const isAllDay = e.detail.value;
+    this.setData({
+      'form.isAllDay': isAllDay,
+      'form.startHour': isAllDay ? '00' : '',
+      'form.startMinute': isAllDay ? '00' : '',
+      'form.endHour': isAllDay ? '23' : '',
+      'form.endMinute': isAllDay ? '59' : ''
+    });
+  },
+
+  // 处理时间输入
+  onTimeInput(e) {
+    const { field } = e.currentTarget.dataset;
+    let { value } = e.detail;
+
+    // 根据字段类型进行验证和格式化
+    switch (field) {
+      case 'startYear':
+      case 'endYear':
+        value = this.validateYear(value);
+        break;
+      case 'startMonth':
+      case 'endMonth':
+        value = this.validateMonth(value);
+        break;
+      case 'startDay':
+      case 'endDay':
+        value = this.validateDay(value);
+        break;
+      case 'startHour':
+      case 'endHour':
+        value = this.validateHour(value);
+        break;
+      case 'startMinute':
+      case 'endMinute':
+        value = this.validateMinute(value);
+        break;
+    }
+
+    this.setData({
+      [`form.${field}`]: value
+    });
+  },
+
+  // 验证年份
+  validateYear(value) {
+    const year = parseInt(value);
+    const currentYear = new Date().getFullYear();
+    if (isNaN(year) || year < currentYear || year > currentYear + 10) {
+      return currentYear.toString();
+    }
+    return value;
+  },
+
+  // 验证月份
+  validateMonth(value) {
+    const month = parseInt(value);
+    if (isNaN(month) || month < 1 || month > 12) {
+      return '01';
+    }
+    return month.toString().padStart(2, '0');
+  },
+
+  // 验证日期
+  validateDay(value) {
+    const day = parseInt(value);
+    if (isNaN(day) || day < 1 || day > 31) {
+      return '01';
+    }
+    return day.toString().padStart(2, '0');
+  },
+
+  // 验证小时
+  validateHour(value) {
+    const hour = parseInt(value);
+    if (isNaN(hour) || hour < 0 || hour > 23) {
+      return '00';
+    }
+    return hour.toString().padStart(2, '0');
+  },
+
+  // 验证分钟
+  validateMinute(value) {
+    const minute = parseInt(value);
+    if (isNaN(minute) || minute < 0 || minute > 59) {
+      return '00';
+    }
+    return minute.toString().padStart(2, '0');
+  },
+
+  formatTaskData() {
+    const { form } = this.data;
+    const now = new Date();
+    
+    return {
+      id: now.getTime().toString(),
+      title: form.title.trim(),
+      priority: form.priority,
+      startTime: {
+        year: form.startYear || now.getFullYear().toString(),
+        month: form.startMonth || (now.getMonth() + 1).toString().padStart(2, '0'),
+        day: form.startDay || now.getDate().toString().padStart(2, '0'),
+        hour: form.startHour || '00',
+        minute: form.startMinute || '00'
+      },
+      dueDate: {
+        year: form.endYear || now.getFullYear().toString(),
+        month: form.endMonth || (now.getMonth() + 1).toString().padStart(2, '0'),
+        day: form.endDay || now.getDate().toString().padStart(2, '0'),
+        hour: form.endHour || '23',
+        minute: form.endMinute || '59'
+      },
+      isAllDay: form.isAllDay,
+      location: form.location.trim(),
+      url: form.url.trim(),
+      notes: form.notes.trim(),
+      attachments: this.data.attachments,
+      completed: false,
+      createTime: now.toISOString(),
+      updateTime: now.toISOString()
+    };
+  },
+
+  // 表单验证
+  validateForm() {
+    const { form } = this.data;
+    
+    if (!form.title.trim()) {
+      wx.showToast({
+        title: '请输入任务标题',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    // 验证时间
+    const startDate = new Date(
+      `${form.startYear || new Date().getFullYear()}-${form.startMonth || '01'}-${form.startDay || '01'}T${form.startHour || '00'}:${form.startMinute || '00'}`
+    );
+    const endDate = new Date(
+      `${form.endYear || new Date().getFullYear()}-${form.endMonth || '01'}-${form.endDay || '01'}T${form.endHour || '23'}:${form.endMinute || '59'}`
+    );
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      wx.showToast({
+        title: '请输入有效的时间',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    if (startDate > endDate) {
+      wx.showToast({
+        title: '开始时间不能晚于结束时间',
+        icon: 'none'
+      });
+      return false;
+    }
+      return false;
+    }
+
+    // 验证日期时间
+    if (!this.validateDateTime()) {
+      return false;
+    }
+
+    return true;
+  },
+
+  // 验证日期时间
+  validateDateTime() {
+    const { startTime, dueDate } = this.data.form;
+    
+    // 如果都未设置，则视为有效
+    if (!startTime && !dueDate) {
+      return true;
+    }
+
+    // 转换为Date对象进行比较
+    const start = startTime ? new Date(startTime) : null;
+    const due = dueDate ? new Date(dueDate) : null;
+
+    // 验证日期格式
+    if ((startTime && isNaN(start?.getTime())) || 
+        (dueDate && isNaN(due?.getTime()))) {
+      wx.showToast({
+        title: '请输入有效的日期',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    // 如果设置了截止日期，验证是否晚于开始日期
+    if (start && due && due < start) {
+      wx.showToast({
+        title: '截止日期不能早于开始日期',
+        icon: 'none'
+      });
+      return false;
+    }
+
+    return true;
+  },
+
+  resetForm() {
+    this.setData({
+      form: {
+        title: '',
+        priority: 0,
+        startTime: '',
+        dueDate: '',
+        location: '',
+        notes: '',
+        url: '',
+        isAllDay: false
+      },
+      submitLoading: false,
+      titleHeight: 44,    // 任务标题高度
+      locationHeight: 44, // 地点输入高度
+      urlHeight: 44,      // 链接输入高度
+      notesHeight: 44,    // 备注高度
+      textareaHeights: {}, // 存储每个textarea的实际高度
+      keyboardHeight: 0,   // 键盘高度
+      attachments: []
+    });
+  },
+})

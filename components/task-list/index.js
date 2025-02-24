@@ -20,44 +20,40 @@ Component({
   methods: {
     // 点击任务项
     onTaskClick(e) {
-      const { task } = e.currentTarget.dataset
-      this.triggerEvent('click', { task })
+      const task = e.currentTarget.dataset.task;
+      this.triggerEvent('taskClick', { task });
     },
 
     // 切换任务状态
     toggleStatus(e) {
-      const { task } = e.currentTarget.dataset
+      const task = e.currentTarget.dataset.task;
+      this.triggerEvent('statusChange', { 
+        task,
+        completed: !task.completed 
+      });
+
+      // 添加视觉反馈
+      this.setData({
+        [`tasks[${this.data.tasks.findIndex(t => t.id === task.id)}].completing`]: true
+      });
       
-      // 先添加完成动画类
-      const tasks = this.data.tasks.map(t => {
-        if (t.id === task.id) {
-          return { ...t, completed: !t.completed, completing: true }
-        }
-        return t
-      })
-      this.setData({ tasks })
-
-      // 等待动画完成后触发状态更新事件
+      // 1秒后移除动画状态
       setTimeout(() => {
-        this.triggerEvent('statusChange', { 
-          task,
-          completed: !task.completed
-        })
-      }, 800) // 与动画时长保持一致
-
-      // 阻止事件冒泡
-      e.stopPropagation()
+        this.setData({
+          [`tasks[${this.data.tasks.findIndex(t => t.id === task.id)}].completing`]: false
+        });
+      }, 1000);
     },
 
     // 切换重要标记
     toggleImportant(e) {
-      const { task } = e.currentTarget.dataset
+      const { task } = e.currentTarget.dataset;
       this.triggerEvent('importantChange', {
         task,
         important: !task.important
-      })
+      });
       // 阻止事件冒泡
-      e.stopPropagation()
+      e.stopPropagation();
     }
   }
 }) 

@@ -1006,6 +1006,11 @@ class Lunar {
     const lunarKey = `${lunar.month}-${lunar.day}`
     return FESTIVALS.lunar[lunarKey] || ''
   }
+
+  getLunarDay(date) {
+    const lunarDate = this.getLunarDate(date);
+    return lunarDate.day; // 返回农历日期数字
+  }
 }
 
 module.exports = new Lunar() 

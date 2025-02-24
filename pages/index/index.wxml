@@ -32,7 +32,7 @@
           <view class="checkbox priority-{{task.priority}} {{task.completed ? 'completed' : ''}}" 
                 catchtap="toggleTaskStatus"
                 data-task-id="{{task.id}}">
-            <text class="check-mark">✓</text>
+            <text class="check-mark" wx:if="{{task.completed}}">✓</text>
           </view>
           <view class="task-content">
             <text class="task-title completed">{{task.title}}</text>
@@ -222,4 +222,8 @@
 <!-- 添加按钮放在容器外部 -->
 <view class="add-btn" bindtap="goToAdd">
   <text>+</text>
-</view> 
+</view>
+<!-- 添加任务按钮 -->
+<view class="add-btn" bindtap="onAddTask">
+  <text>+</text>
+</view>

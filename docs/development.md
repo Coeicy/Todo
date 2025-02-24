@@ -244,3 +244,39 @@ git push
 - 使用 console 调试
 - 查看存储数据
 - 分析性能数据 
+
+## 最新更新
+
+### 1. 任务创建流程
+- 从日历页面创建:
+  ```javascript
+  // 跳转到添加页面时携带日期和来源参数
+  wx.navigateTo({
+    url: `/pages/task/add/index?date=${date}&fromCalendar=true`
+  })
+  ```
+- 全天任务处理:
+  ```javascript
+  // 切换全天任务时只修改时间
+  onAllDayChange(e) {
+    const isAllDay = e.detail.value
+    if (isAllDay) {
+      this.setData({
+        'form.startHour': '00',
+        'form.startMinute': '00',
+        'form.endHour': '23',
+        'form.endMinute': '59'
+      })
+    }
+  }
+  ```
+
+### 2. 日期时间处理
+- 优化日期选择逻辑
+- 完善时间输入验证
+- 改进日期显示格式
+
+### 3. 界面交互优化
+- 添加表单验证提示
+- 优化加载状态显示
+- 完善错误处理机制 
